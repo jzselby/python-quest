@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Quest 🐍 — Learn Python This Summer!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-deep: #0b0a1a;
+  --bg-panel: #141328;
+  --bg-card: #1c1b36;
+  --bg-editor: #1e1d3a;
+  --cyan: #2de2e6;
+  --yellow: #f5c842;
+  --green: #0eff9d;
+  --coral: #ff4f7b;
+  --purple: #b07aff;
+  --text: #e8e6f0;
+  --text-dim: #8b89a6;
+  --border: #2a2950;
+  --radius: 14px;
+}
+
+html { font-size: 15px; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg-deep);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ═══ STARFIELD BACKGROUND ═══ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(1.5px 1.5px at 20% 30%, rgba(45,226,230,0.3), transparent),
+    radial-gradient(1px 1px at 40% 70%, rgba(176,122,255,0.25), transparent),
+    radial-gradient(1.2px 1.2px at 60% 20%, rgba(245,200,66,0.2), transparent),
+    radial-gradient(1px 1px at 80% 60%, rgba(14,255,157,0.2), transparent),
+    radial-gradient(1.5px 1.5px at 10% 80%, rgba(45,226,230,0.15), transparent),
+    radial-gradient(1px 1px at 90% 10%, rgba(255,79,123,0.2), transparent),
+    radial-gradient(1.2px 1.2px at 50% 50%, rgba(176,122,255,0.15), transparent),
+    radial-gradient(1px 1px at 30% 90%, rgba(245,200,66,0.15), transparent),
+    radial-gradient(1.5px 1.5px at 70% 40%, rgba(14,255,157,0.15), transparent),
+    radial-gradient(1px 1px at 15% 55%, rgba(45,226,230,0.2), transparent),
+    radial-gradient(1.2px 1.2px at 85% 85%, rgba(176,122,255,0.2), transparent),
+    radial-gradient(1px 1px at 45% 15%, rgba(255,79,123,0.15), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ═══ LAYOUT ═══ */
+.app {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+  gap: 0;
+}
+
+/* ═══ HEADER ═══ */
+.header {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 28px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  font-size: 2rem;
+  animation: wiggle 3s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-8deg); }
+  75% { transform: rotate(8deg); }
+}
+
+.logo h1 {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+  font-size: 1.6rem;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.logo h1 span {
+  -webkit-text-fill-color: var(--yellow);
+}
+
+.progress-area {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.progress-bar-wrap {
+  width: 180px;
+  height: 12px;
+  background: var(--bg-card);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyan), var(--green));
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  width: 0%;
+}
+
+.progress-text {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  min-width: 55px;
+}
+
+/* ═══ SIDEBAR ═══ */
+.sidebar {
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border);
+  padding: 16px 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.sidebar-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  padding: 0 20px;
+  margin-bottom: 10px;
+}
+
+.lesson-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  border-left: 3px solid transparent;
+}
+
+.lesson-btn:hover {
+  background: rgba(45, 226, 230, 0.06);
+  color: var(--text);
+}
+
+.lesson-btn.active {
+  background: rgba(45, 226, 230, 0.1);
+  color: var(--cyan);
+  border-left-color: var(--cyan);
+  font-weight: 700;
+}
+
+.lesson-btn.completed .lesson-check {
+  color: var(--green);
+}
+
+.lesson-emoji {
+  font-size: 1.15rem;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.lesson-check {
+  margin-left: auto;
+  font-size: 0.85rem;
+  color: transparent;
+  flex-shrink: 0;
+}
+
+/* ═══ MAIN CONTENT ═══ */
+.main {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* lesson info */
+.lesson-info {
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-panel);
+}
+
+.lesson-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.lesson-number {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--cyan);
+}
+
+.lesson-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.lesson-desc {
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-bottom: 14px;
+  max-width: 720px;
+}
+
+.concept-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  background: rgba(176, 122, 255, 0.12);
+  color: var(--purple);
+  border-radius: 999px;
+  border: 1px solid rgba(176, 122, 255, 0.2);
+}
+
+/* ═══ WORKSPACE ═══ */
+.workspace {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+  overflow: hidden;
+}
+
+.editor-panel, .output-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.editor-panel {
+  border-right: 1px solid var(--border);
+}
+
+.panel-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  min-height: 44px;
+}
+
+.panel-label {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 6px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-run {
+  background: linear-gradient(135deg, var(--green), #0ad884);
+  color: #0a1a0f;
+}
+
+.btn-run:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(14,255,157,0.3); }
+.btn-run:active { transform: translateY(0); }
+.btn-run:disabled { opacity: 0.5; cursor: wait; }
+
+.btn-reset {
+  background: rgba(255,255,255,0.06);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+
+.btn-reset:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+
+.btn-hint {
+  background: rgba(245, 200, 66, 0.12);
+  color: var(--yellow);
+  border: 1px solid rgba(245, 200, 66, 0.25);
+}
+
+.btn-hint:hover { background: rgba(245, 200, 66, 0.2); }
+
+/* CodeMirror overrides */
+.editor-wrap {
+  flex: 1;
+  overflow: auto;
+}
+
+.editor-wrap .CodeMirror {
+  height: 100%;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.92rem;
+  line-height: 1.65;
+  background: var(--bg-editor);
+  padding: 8px 0;
+}
+
+.CodeMirror-gutters {
+  background: var(--bg-editor) !important;
+  border-right: 1px solid var(--border) !important;
+}
+
+.CodeMirror-linenumber {
+  color: var(--text-dim) !important;
+  opacity: 0.5;
+}
+
+/* ═══ OUTPUT ═══ */
+.output-wrap {
+  flex: 1;
+  overflow: auto;
+  padding: 16px 20px;
+  background: var(--bg-deep);
+}
+
+.output-line {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.88rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.output-line.stdout { color: var(--text); }
+.output-line.stderr { color: var(--coral); }
+.output-line.system { color: var(--text-dim); font-style: italic; }
+
+.output-placeholder {
+  color: var(--text-dim);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 60px;
+  opacity: 0.6;
+}
+
+.output-placeholder .big-emoji {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+/* ═══ CHALLENGE BOX ═══ */
+.challenge-box {
+  padding: 14px 20px;
+  background: rgba(245, 200, 66, 0.06);
+  border-top: 1px solid rgba(245, 200, 66, 0.15);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.challenge-box .emoji { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+.challenge-box p {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--yellow);
+}
+
+.challenge-box p strong {
+  color: #ffd866;
+}
+
+/* ═══ SUCCESS OVERLAY ═══ */
+.success-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-120px);
+  background: linear-gradient(135deg, var(--bg-card), #1e2a1e);
+  border: 2px solid var(--green);
+  border-radius: 16px;
+  padding: 16px 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 1000;
+  box-shadow: 0 8px 40px rgba(14, 255, 157, 0.2);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.success-toast.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+.success-toast .emoji { font-size: 1.8rem; }
+
+.success-toast .msg {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.1rem;
+  color: var(--green);
+  font-weight: 600;
+}
+
+/* ═══ HINT POPUP ═══ */
+.hint-box {
+  padding: 14px 20px;
+  background: rgba(245, 200, 66, 0.08);
+  border-top: 1px solid rgba(245, 200, 66, 0.15);
+  display: none;
+}
+
+.hint-box.show { display: block; }
+
+.hint-box p {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--yellow);
+  opacity: 0.85;
+}
+
+.hint-box code {
+  font-family: 'Fira Code', monospace;
+  background: rgba(245, 200, 66, 0.12);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+}
+
+/* ═══ LOADING SCREEN ═══ */
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-deep);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.6s, visibility 0.6s;
+}
+
+.loading-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loading-snake {
+  font-size: 4rem;
+  animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-16px); }
+}
+
+.loading-text {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.2rem;
+  color: var(--cyan);
+  margin-top: 16px;
+}
+
+.loading-sub {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-top: 6px;
+}
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 900px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    padding-top: 60px;
+  }
+
+  .sidebar.open {
+    display: block;
+  }
+
+  .workspace {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+
+  .editor-panel {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .menu-toggle {
+    display: flex !important;
+  }
+}
+
+.menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 1.2rem;
+}
+
+/* ═══ NAV BUTTONS ═══ */
+.nav-btns {
+  display: flex;
+  gap: 6px;
+  padding: 0 16px;
+  padding-bottom: 6px;
+}
+
+.btn-nav {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  background: rgba(45, 226, 230, 0.08);
+  border: 1px solid rgba(45, 226, 230, 0.15);
+  border-radius: 8px;
+  color: var(--cyan);
+  cursor: pointer;
+  transition: all 0.2s;
+  flex: 1;
+  text-align: center;
+}
+
+.btn-nav:hover { background: rgba(45, 226, 230, 0.15); }
+.btn-nav:disabled { opacity: 0.3; cursor: default; }
+
+/* ═══ CONFETTI ═══ */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 999;
+  overflow: hidden;
+}
+
+.confetti {
+  position: absolute;
+  top: -10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  animation: confetti-fall linear forwards;
+}
+
+@keyframes confetti-fall {
+  to {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Loading Screen -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-snake">🐍</div>
+  <div class="loading-text">Summoning Python...</div>
+  <div class="loading-sub">Loading the Python engine in your browser — first time takes a few seconds!</div>
+</div>
+
+<!-- Success Toast -->
+<div class="success-toast" id="successToast">
+  <span class="emoji">🎉</span>
+  <span class="msg" id="successMsg">Mission Complete!</span>
+</div>
+
+<!-- Confetti Container -->
+<div class="confetti-container" id="confettiContainer"></div>
+
+<!-- ═══ APP ═══ -->
+<div class="app">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()">☰</button>
+      <span class="logo-icon">🐍</span>
+      <h1>Python <span>Quest</span></h1>
+    </div>
+    <div class="progress-area">
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progressFill"></div>
+      </div>
+      <span class="progress-text" id="progressText">0 / 10</span>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-title">Missions</div>
+    <div id="lessonList"></div>
+    <div class="nav-btns" style="margin-top: 8px;">
+      <button class="btn-nav" id="btnPrev" onclick="navigateLesson(-1)">← Prev</button>
+      <button class="btn-nav" id="btnNext" onclick="navigateLesson(1)">Next →</button>
+    </div>
+  </nav>
+
+  <!-- Main Area -->
+  <main class="main">
+    <div class="lesson-info" id="lessonInfo">
+      <div class="lesson-number" id="lessonNumber">Mission 1</div>
+      <h2 class="lesson-title" id="lessonTitle">Say Hello!</h2>
+      <p class="lesson-desc" id="lessonDesc"></p>
+      <div class="concept-chips" id="conceptChips"></div>
+    </div>
+
+    <div class="workspace">
+      <!-- Editor -->
+      <div class="editor-panel">
+        <div class="panel-toolbar">
+          <span class="panel-label">📝 Your Code</span>
+          <div class="toolbar-actions">
+            <button class="btn btn-hint" onclick="toggleHint()">💡 Hint</button>
+            <button class="btn btn-reset" onclick="resetCode()">↺ Reset</button>
+            <button class="btn btn-run" id="btnRun" onclick="runCode()">▶ Run</button>
+          </div>
+        </div>
+        <div class="hint-box" id="hintBox"><p id="hintText"></p></div>
+        <div class="challenge-box" id="challengeBox">
+          <span class="emoji">🎯</span>
+          <p id="challengeText"></p>
+        </div>
+        <div class="editor-wrap">
+          <textarea id="codeEditor"></textarea>
+        </div>
+      </div>
+
+      <!-- Output -->
+      <div class="output-panel">
+        <div class="panel-toolbar">
+          <span class="panel-label">📺 Output</span>
+          <div class="toolbar-actions">
+            <button class="btn btn-reset" onclick="clearOutput()">Clear</button>
+          </div>
+        </div>
+        <div class="output-wrap" id="outputWrap">
+          <div class="output-placeholder">
+            <span class="big-emoji">👆</span>
+            Hit <strong>▶ Run</strong> to see your code come to life!
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+
+<script>
+// ═══════════════════════════════════════════
+//  LESSON DATA
+// ═══════════════════════════════════════════
+const LESSONS = [
+  {
+    id: 1,
+    title: "Say Hello!",
+    emoji: "👋",
+    concepts: ["print()"],
+    desc: `Every coder's first program is "Hello, World!" — it's a tradition!\n\nThe <code>print()</code> command tells Python to display text on screen. Put your message inside quotes and parentheses.`,
+    code: `# Your first Python program!\n# Click ▶ Run to see it work\n\nprint("Hello, World!")\n`,
+    challenge: `<strong>Your mission:</strong> Change the message so it prints your name instead. For example: <code>print("Hello, I'm Alex!")</code>`,
+    hint: `Replace the text inside the quotes with your own message. Make sure you keep the quote marks!`,
+    check: (output) => {
+      const out = output.trim().toLowerCase();
+      return out.length > 0 && out !== "hello, world!";
+    }
+  },
+  {
+    id: 2,
+    title: "Variables",
+    emoji: "📦",
+    concepts: ["variables", "=", "print()", "types"],
+    desc: `Variables are like labeled boxes where you store information. You create one by picking a name and using <code>=</code> to put a value inside.\n\nPython has different types of data: <strong>text</strong> (strings in quotes), <strong>numbers</strong> (integers), and <strong>decimals</strong> (floats).`,
+    code: `# Variables store information\nname = "Python"\nage = 33\nfavorite_number = 3.14\n\nprint(name)\nprint(age)\nprint(favorite_number)\nprint(type(name))\n`,
+    challenge: `<strong>Your mission:</strong> Create three variables about yourself — <code>my_name</code>, <code>my_age</code>, and <code>favorite_food</code> — then print all three.`,
+    hint: `Try: <code>my_name = "Alex"</code> then <code>print(my_name)</code>. Text needs quotes around it, numbers don't!`,
+    check: (output) => {
+      const lines = output.trim().split('\n').filter(l => l.trim());
+      return lines.length >= 3;
+    }
+  },
+  {
+    id: 3,
+    title: "Math Magic",
+    emoji: "🔢",
+    concepts: ["+", "-", "*", "/", "//", "%", "**"],
+    desc: `Python is a powerful calculator! You can use math operators to do all kinds of calculations.\n\n<code>+</code> add · <code>-</code> subtract · <code>*</code> multiply · <code>/</code> divide\n<code>//</code> divide (whole number) · <code>%</code> remainder · <code>**</code> power (exponents!)`,
+    code: `# Python math!\nprint(10 + 5)       # addition\nprint(20 - 8)       # subtraction\nprint(6 * 7)        # multiplication\nprint(100 / 3)      # division\nprint(100 // 3)     # whole number division\nprint(10 % 3)       # remainder\nprint(2 ** 10)      # 2 to the power of 10\n`,
+    challenge: `<strong>Your mission:</strong> Calculate how many seconds are in a full day (24 hours × 60 minutes × 60 seconds) and print the answer. Then calculate 3 to the power of 5.`,
+    hint: `Try: <code>seconds = 24 * 60 * 60</code> then <code>print(seconds)</code>. For the power, use <code>3 ** 5</code>.`,
+    check: (output) => {
+      return output.includes("86400") && output.includes("243");
+    }
+  },
+  {
+    id: 4,
+    title: "String Superpowers",
+    emoji: "🔤",
+    concepts: ["f-strings", "len()", "+", ".upper()", ".lower()"],
+    desc: `Strings are text in Python. They have awesome superpowers!\n\n<strong>f-strings</strong> let you mix variables into text: <code>f"Hi {name}"</code>\nYou can also combine strings with <code>+</code>, find their length with <code>len()</code>, and change their case.`,
+    code: `name = "Python"\nyear = 2026\n\n# f-strings — the best way to mix text and variables\nprint(f"Welcome to {name} Quest!")\nprint(f"The year is {year}")\n\n# String tricks\nprint("hello".upper())       # HELLO\nprint("SHOUT".lower())       # shout\nprint(len("How long am I?")) # count characters\n\n# Combining strings\nfirst = "Python"\nsecond = "Quest"\nprint(first + " " + second)\n`,
+    challenge: `<strong>Your mission:</strong> Create variables for your first name and favorite animal. Then use an f-string to print a sentence like: <code>"Hi, I'm Alex and I love pandas!"</code>. Also print how many letters are in your name using <code>len()</code>.`,
+    hint: `Try: <code>my_name = "Alex"</code> then <code>print(f"Hi, I'm {my_name} and I love {animal}!")</code> and <code>print(len(my_name))</code>`,
+    check: (output) => {
+      const lines = output.trim().split('\n').filter(l => l.trim());
+      return lines.length >= 2;
+    }
+  },
+  {
+    id: 5,
+    title: "Making Decisions",
+    emoji: "🤔",
+    concepts: ["if", "elif", "else", "==", ">", "<", ">=", "<="],
+    desc: `Programs can make decisions! Use <code>if</code> to check a condition, <code>elif</code> for extra checks, and <code>else</code> as a fallback.\n\nComparison operators: <code>==</code> equals · <code>!=</code> not equal · <code>></code> greater · <code><</code> less\n\n<strong>Important:</strong> The code inside an if block must be indented (press Tab or use 4 spaces).`,
+    code: `temperature = 85\n\nif temperature > 90:\n    print("🔥 It's super hot! Stay hydrated!")\nelif temperature > 70:\n    print("☀️ Nice and warm outside!")\nelif temperature > 50:\n    print("🧥 A bit chilly, grab a jacket.")\nelse:\n    print("🥶 Brrr! It's freezing!")\n\nprint(f"The temperature is {temperature}°F")\n`,
+    challenge: `<strong>Your mission:</strong> Create a variable called <code>score</code> with a number from 0-100. Write if/elif/else statements that print "A" for 90+, "B" for 80+, "C" for 70+, and "Try harder!" for anything below.`,
+    hint: `Start with <code>score = 85</code>, then <code>if score >= 90:</code> followed by the indented print, then <code>elif score >= 80:</code> and so on.`,
+    check: (output) => {
+      const out = output.trim().toUpperCase();
+      return out.includes("A") || out.includes("B") || out.includes("C") || out.includes("TRY");
+    }
+  },
+  {
+    id: 6,
+    title: "Loop It!",
+    emoji: "🔁",
+    concepts: ["for", "range()", "in"],
+    desc: `Loops let you repeat code without typing it over and over.\n\n<code>for</code> loops go through a sequence of items one at a time. <code>range(n)</code> gives you numbers from 0 up to (but not including) n. You can also loop through strings and lists!`,
+    code: `# Count from 0 to 4\nfor i in range(5):\n    print(f"Count: {i}")\n\nprint("---")\n\n# Count from 1 to 5\nfor num in range(1, 6):\n    print(f"{num} x 3 = {num * 3}")\n\nprint("---")\n\n# Loop through letters\nfor letter in "PYTHON":\n    print(letter, end=" ")\nprint()  # new line\n`,
+    challenge: `<strong>Your mission:</strong> Use a for loop to print a triangle of stars like this:<br><code>*</code><br><code>**</code><br><code>***</code><br><code>****</code><br><code>*****</code><br>(Hint: <code>"*" * 3</code> gives you <code>"***"</code>)`,
+    hint: `Try: <code>for i in range(1, 6):</code> then inside: <code>print("*" * i)</code>`,
+    check: (output) => {
+      return output.includes("*") && output.includes("**") && output.includes("***") && output.includes("*****");
+    }
+  },
+  {
+    id: 7,
+    title: "While Loops",
+    emoji: "⏳",
+    concepts: ["while", "break", "+="],
+    desc: `A <code>while</code> loop keeps going as long as a condition is True. It's great for countdowns, menus, and repeating until something happens.\n\n<strong>Be careful!</strong> If the condition never becomes False, you get an infinite loop (but don't worry — we'll stop it if that happens).`,
+    code: `# Countdown!\ncountdown = 5\nwhile countdown > 0:\n    print(f"{countdown}...")\n    countdown -= 1\nprint("🚀 Liftoff!")\n\nprint("---")\n\n# Adding up numbers\ntotal = 0\nnumber = 1\nwhile number <= 10:\n    total += number\n    number += 1\nprint(f"Sum of 1-10 = {total}")\n`,
+    challenge: `<strong>Your mission:</strong> Use a while loop to find the first power of 2 that's bigger than 1000. Start with <code>power = 1</code> and keep doubling it. Print each step and the final answer.`,
+    hint: `Try: <code>power = 1</code>, then <code>while power <= 1000:</code> with <code>print(power)</code> and <code>power *= 2</code> inside. After the loop, print the final value.`,
+    check: (output) => {
+      return output.includes("1024");
+    }
+  },
+  {
+    id: 8,
+    title: "Lists",
+    emoji: "📋",
+    concepts: ["list", "append()", "len()", "indexing", "for...in"],
+    desc: `Lists let you store multiple items in one variable — like a grocery list or a roster of players!\n\nItems are numbered starting at 0 (the first item is index 0). You can add items with <code>.append()</code>, check the length with <code>len()</code>, and loop through them.`,
+    code: `# Creating a list\nfruits = ["apple", "banana", "cherry", "mango"]\n\nprint(fruits)         # whole list\nprint(fruits[0])      # first item\nprint(fruits[-1])     # last item\nprint(len(fruits))    # how many items\n\n# Adding items\nfruits.append("grape")\nprint(fruits)\n\n# Looping through a list\nfor fruit in fruits:\n    print(f"I like {fruit}!")\n`,
+    challenge: `<strong>Your mission:</strong> Create a list of at least 4 of your favorite games, movies, or songs. Print how many items are in the list. Then add one more with <code>.append()</code> and use a for loop to print each one with a number (like "1. Minecraft").`,
+    hint: `Use <code>enumerate</code> to get numbers: <code>for i, item in enumerate(favorites, 1):</code> then <code>print(f"{i}. {item}")</code>`,
+    check: (output) => {
+      const lines = output.trim().split('\n').filter(l => l.trim());
+      return lines.length >= 5;
+    }
+  },
+  {
+    id: 9,
+    title: "Functions",
+    emoji: "🏗️",
+    concepts: ["def", "parameters", "return"],
+    desc: `Functions are reusable blocks of code — like building your own custom commands!\n\nUse <code>def</code> to define a function, give it a name and optional <strong>parameters</strong> (inputs). Use <code>return</code> to send a result back.`,
+    code: `# A simple function\ndef greet(name):\n    return f"Hey {name}! Welcome to Python Quest! 🎮"\n\nmessage = greet("Coder")\nprint(message)\n\n# Function with math\ndef area_of_rectangle(width, height):\n    return width * height\n\nroom = area_of_rectangle(12, 10)\nprint(f"Room area: {room} sq ft")\n\n# Function with a loop inside\ndef count_vowels(text):\n    count = 0\n    for char in text.lower():\n        if char in "aeiou":\n            count += 1\n    return count\n\nword = "Dinosaur"\nprint(f"'{word}' has {count_vowels(word)} vowels")\n`,
+    challenge: `<strong>Your mission:</strong> Write a function called <code>is_even(number)</code> that returns <code>True</code> if the number is even and <code>False</code> if it's odd. Then test it by printing the results for 4, 7, and 10.`,
+    hint: `A number is even if <code>number % 2 == 0</code>. Use <code>return number % 2 == 0</code> inside the function.`,
+    check: (output) => {
+      return output.includes("True") && output.includes("False");
+    }
+  },
+  {
+    id: 10,
+    title: "Final Quest!",
+    emoji: "🏆",
+    concepts: ["everything!"],
+    desc: `You've learned printing, variables, math, strings, decisions, loops, lists, and functions — everything you need to build real programs!\n\nFor your final mission, put it all together. Below is a starter project: a number guessing game. Study how it works, then modify it to make it your own!`,
+    code: `import random\n\ndef play_game():\n    secret = random.randint(1, 20)\n    attempts = []\n    max_tries = 5\n\n    print("🎲 NUMBER GUESSING GAME 🎲")\n    print(f"I'm thinking of a number between 1 and 20.")\n    print(f"You have {max_tries} tries. Good luck!\\n")\n\n    for turn in range(1, max_tries + 1):\n        # Since we can't use input() in the browser,\n        # we'll simulate guesses\n        guess = random.randint(1, 20)\n        attempts.append(guess)\n        print(f"Try {turn}: You guessed {guess}")\n\n        if guess == secret:\n            print(f"\\n🎉 YES! The number was {secret}!")\n            print(f"You got it in {turn} tries!")\n            return\n        elif guess < secret:\n            print("   📈 Too low! Go higher.")\n        else:\n            print("   📉 Too high! Go lower.")\n\n    print(f"\\n😅 Out of tries! The number was {secret}.")\n    print(f"Your guesses were: {attempts}")\n\nplay_game()\n`,
+    challenge: `<strong>Final mission:</strong> Modify the game! Ideas: Change the range to 1-100, add more tries, add a scoring system, print a different message based on how many tries it took, or create an entirely new game!`,
+    hint: `Try changing <code>random.randint(1, 20)</code> to <code>random.randint(1, 100)</code> and <code>max_tries</code> to 7. Add an if/elif/else after the game to rate performance: 1-2 tries = "Amazing!", 3-4 = "Good!", 5+ = "Keep practicing!"`,
+    check: (output) => {
+      return output.includes("GAME") || output.includes("game") || output.length > 100;
+    }
+  }
+];
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+let currentLesson = 0;
+let completed = new Set();
+let pyodide = null;
+let editor = null;
+
+// Load progress from localStorage
+function loadProgress() {
+  try {
+    const saved = localStorage.getItem('pythonquest_completed');
+    if (saved) completed = new Set(JSON.parse(saved));
+    const savedLesson = localStorage.getItem('pythonquest_current');
+    if (savedLesson !== null) currentLesson = parseInt(savedLesson);
+  } catch(e) {}
+}
+
+function saveProgress() {
+  try {
+    localStorage.setItem('pythonquest_completed', JSON.stringify([...completed]));
+    localStorage.setItem('pythonquest_current', currentLesson);
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+async function init() {
+  loadProgress();
+
+  // Init CodeMirror
+  editor = CodeMirror.fromTextArea(document.getElementById('codeEditor'), {
+    mode: 'python',
+    theme: 'dracula',
+    lineNumbers: true,
+    autoCloseBrackets: true,
+    tabSize: 4,
+    indentUnit: 4,
+    indentWithTabs: false,
+    lineWrapping: true,
+    extraKeys: {
+      "Tab": (cm) => cm.replaceSelection("    "),
+      "Ctrl-Enter": () => runCode(),
+      "Cmd-Enter": () => runCode(),
+    }
+  });
+
+  // Build sidebar
+  buildLessonList();
+
+  // Load current lesson
+  loadLesson(currentLesson);
+
+  // Load Pyodide
+  try {
+    pyodide = await loadPyodide({
+      indexURL: "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/"
+    });
+    // Override input() to use browser prompt
+    await pyodide.runPythonAsync(`
+import sys
+from io import StringIO
+
+class BrowserInput:
+    def readline(self):
+        from js import prompt
+        result = prompt("Python input:")
+        if result is None:
+            result = ""
+        print(result)  # echo to output
+        return result + "\\n"
+
+sys.stdin = BrowserInput()
+    `);
+    document.getElementById('loadingScreen').classList.add('hidden');
+  } catch (err) {
+    document.querySelector('.loading-text').textContent = 'Hmm, trouble loading Python...';
+    document.querySelector('.loading-sub').textContent = 'Try refreshing the page. If it persists, check your internet connection.';
+    console.error('Pyodide load error:', err);
+  }
+}
+
+// ═══════════════════════════════════════════
+//  UI FUNCTIONS
+// ═══════════════════════════════════════════
+function buildLessonList() {
+  const container = document.getElementById('lessonList');
+  container.innerHTML = LESSONS.map((lesson, i) => `
+    <button class="lesson-btn ${i === currentLesson ? 'active' : ''} ${completed.has(lesson.id) ? 'completed' : ''}"
+            onclick="loadLesson(${i})" data-lesson-index="${i}">
+      <span class="lesson-emoji">${lesson.emoji}</span>
+      <span>${lesson.title}</span>
+      <span class="lesson-check">${completed.has(lesson.id) ? '✅' : '○'}</span>
+    </button>
+  `).join('');
+}
+
+function loadLesson(index) {
+  currentLesson = index;
+  const lesson = LESSONS[index];
+  saveProgress();
+
+  // Update info panel
+  document.getElementById('lessonNumber').textContent = `Mission ${lesson.id}`;
+  document.getElementById('lessonTitle').textContent = `${lesson.emoji} ${lesson.title}`;
+  document.getElementById('lessonDesc').innerHTML = lesson.desc;
+  document.getElementById('challengeText').innerHTML = lesson.challenge;
+  document.getElementById('hintText').innerHTML = lesson.hint;
+  document.getElementById('hintBox').classList.remove('show');
+
+  // Concept chips
+  document.getElementById('conceptChips').innerHTML = lesson.concepts
+    .map(c => `<span class="chip">${c}</span>`).join('');
+
+  // Load code into editor
+  editor.setValue(lesson.code);
+  editor.clearHistory();
+  setTimeout(() => editor.refresh(), 10);
+
+  // Update sidebar active state
+  buildLessonList();
+
+  // Update nav buttons
+  document.getElementById('btnPrev').disabled = index === 0;
+  document.getElementById('btnNext').disabled = index === LESSONS.length - 1;
+
+  // Clear output
+  clearOutput();
+  updateProgress();
+
+  // Close mobile sidebar
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+function navigateLesson(dir) {
+  const next = currentLesson + dir;
+  if (next >= 0 && next < LESSONS.length) {
+    loadLesson(next);
+  }
+}
+
+function toggleHint() {
+  document.getElementById('hintBox').classList.toggle('show');
+}
+
+function resetCode() {
+  editor.setValue(LESSONS[currentLesson].code);
+  editor.clearHistory();
+}
+
+function clearOutput() {
+  document.getElementById('outputWrap').innerHTML =
+    `<div class="output-placeholder"><span class="big-emoji">👆</span>Hit <strong>▶ Run</strong> to see your code come to life!</div>`;
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+function updateProgress() {
+  const pct = (completed.size / LESSONS.length) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${completed.size} / ${LESSONS.length}`;
+}
+
+// ═══════════════════════════════════════════
+//  RUN CODE
+// ═══════════════════════════════════════════
+async function runCode() {
+  if (!pyodide) {
+    alert("Python is still loading — hang tight!");
+    return;
+  }
+
+  const btn = document.getElementById('btnRun');
+  btn.disabled = true;
+  btn.textContent = '⏳ Running...';
+
+  const outputWrap = document.getElementById('outputWrap');
+  outputWrap.innerHTML = '';
+
+  const code = editor.getValue();
+
+  try {
+    // Capture stdout and stderr
+    await pyodide.runPythonAsync(`
+import sys
+from io import StringIO
+sys.stdout = StringIO()
+sys.stderr = StringIO()
+    `);
+
+    // Run user code with a timeout guard
+    try {
+      await pyodide.runPythonAsync(code);
+    } catch (pyErr) {
+      // Get any partial output
+      const partialOut = await pyodide.runPythonAsync('sys.stdout.getvalue()');
+      if (partialOut) {
+        appendOutput(partialOut, 'stdout');
+      }
+      appendOutput(formatError(pyErr.message), 'stderr');
+      btn.disabled = false;
+      btn.textContent = '▶ Run';
+      return;
+    }
+
+    // Get output
+    const stdout = await pyodide.runPythonAsync('sys.stdout.getvalue()');
+    const stderr = await pyodide.runPythonAsync('sys.stderr.getvalue()');
+
+    if (stdout) appendOutput(stdout, 'stdout');
+    if (stderr) appendOutput(stderr, 'stderr');
+
+    if (!stdout && !stderr) {
+      outputWrap.innerHTML =
+        '<div class="output-line system">✅ Code ran successfully! (no output — try adding a print() statement)</div>';
+    }
+
+    // Check challenge completion
+    const lesson = LESSONS[currentLesson];
+    if (stdout && lesson.check(stdout)) {
+      if (!completed.has(lesson.id)) {
+        completed.add(lesson.id);
+        saveProgress();
+        updateProgress();
+        buildLessonList();
+        showSuccess();
+      }
+    }
+
+  } catch (err) {
+    appendOutput(formatError(err.message), 'stderr');
+  }
+
+  // Reset stdout/stderr
+  try {
+    await pyodide.runPythonAsync(`
+import sys
+sys.stdout = sys.__stdout__
+sys.stderr = sys.__stderr__
+    `);
+  } catch(e) {}
+
+  btn.disabled = false;
+  btn.textContent = '▶ Run';
+}
+
+function formatError(msg) {
+  // Clean up Pyodide error traces to be less scary for kids
+  const lines = msg.split('\n');
+  const relevant = [];
+  let capture = false;
+  for (const line of lines) {
+    if (line.includes('Error') || line.includes('error')) {
+      capture = true;
+    }
+    if (capture || line.trim().startsWith('File "<exec>"')) {
+      relevant.push(line);
+    }
+  }
+  if (relevant.length > 0) {
+    return '❌ Oops! ' + relevant.join('\n');
+  }
+  return '❌ Oops! ' + msg;
+}
+
+function appendOutput(text, type) {
+  const wrap = document.getElementById('outputWrap');
+  const lines = text.split('\n');
+  // Remove trailing empty line
+  if (lines[lines.length - 1] === '') lines.pop();
+
+  for (const line of lines) {
+    const div = document.createElement('div');
+    div.className = `output-line ${type}`;
+    div.textContent = line;
+    wrap.appendChild(div);
+  }
+}
+
+// ═══════════════════════════════════════════
+//  CELEBRATIONS
+// ═══════════════════════════════════════════
+const SUCCESS_MESSAGES = [
+  "🎉 Mission Complete!",
+  "⭐ Nailed it!",
+  "🚀 You're a natural!",
+  "🏆 Challenge crushed!",
+  "💪 Awesome work!",
+  "🌟 Brilliant!",
+  "🎯 Bullseye!",
+  "🐍 Python master in the making!",
+  "🔥 On fire!",
+  "✨ Spectacular!",
+];
+
+function showSuccess() {
+  const toast = document.getElementById('successToast');
+  const msg = SUCCESS_MESSAGES[Math.floor(Math.random() * SUCCESS_MESSAGES.length)];
+  document.getElementById('successMsg').textContent = msg;
+  toast.classList.add('show');
+  launchConfetti();
+  setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+function launchConfetti() {
+  const container = document.getElementById('confettiContainer');
+  const colors = ['#2de2e6', '#f5c842', '#0eff9d', '#ff4f7b', '#b07aff'];
+  for (let i = 0; i < 50; i++) {
+    const conf = document.createElement('div');
+    conf.className = 'confetti';
+    conf.style.left = Math.random() * 100 + '%';
+    conf.style.background = colors[Math.floor(Math.random() * colors.length)];
+    conf.style.width = (Math.random() * 8 + 5) + 'px';
+    conf.style.height = (Math.random() * 8 + 5) + 'px';
+    conf.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+    conf.style.animationDelay = (Math.random() * 0.5) + 's';
+    container.appendChild(conf);
+  }
+  setTimeout(() => { container.innerHTML = ''; }, 4000);
+}
+
+// ═══════════════════════════════════════════
+//  KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    runCode();
+  }
+});
+
+// ═══════════════════════════════════════════
+//  START!
+// ═══════════════════════════════════════════
+init();
+</script>
+</body>
+</html>
