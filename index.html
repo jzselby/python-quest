@@ -3,1341 +3,346 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Python Quest 🐍 — Learn Python This Summer!</title>
+<title>Python Quest — Learn Python This Summer!</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg-deep: #0b0a1a;
-    --bg-panel: #131225;
-    --bg-card: #1c1b36;
-    --bg-editor: #1e1d3a;
-    --cyan: #2de2e6;
-    --yellow: #f5c842;
-    --green: #0eff9d;
-    --coral: #ff4f7b;
-    --purple: #b07aff;
-    --orange: #ff9f43;
-    --text: #e8e6f0;
-    --text-dim: #8280a0;
-    --border: #2a2950;
-  }
-
-  html { font-size: 15px; }
-
-  body {
-    font-family: 'Nunito', sans-serif;
-    background: var(--bg-deep);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* starfield */
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background:
-      radial-gradient(1.4px 1.4px at 18% 28%, rgba(45,226,230,0.3), transparent),
-      radial-gradient(1px 1px at 42% 72%, rgba(176,122,255,0.25), transparent),
-      radial-gradient(1.2px 1.2px at 62% 18%, rgba(245,200,66,0.2), transparent),
-      radial-gradient(1px 1px at 82% 58%, rgba(14,255,157,0.2), transparent),
-      radial-gradient(1.4px 1.4px at 8% 82%, rgba(45,226,230,0.15), transparent),
-      radial-gradient(1px 1px at 92% 12%, rgba(255,79,123,0.2), transparent),
-      radial-gradient(1.2px 1.2px at 55% 45%, rgba(176,122,255,0.1), transparent),
-      radial-gradient(1px 1px at 35% 88%, rgba(245,200,66,0.1), transparent);
-    pointer-events: none; z-index: 0;
-  }
-
-  /* ── LAYOUT ── */
-  .app {
-    position: relative; z-index: 1;
-    display: grid;
-    grid-template-columns: 280px 1fr;
-    grid-template-rows: auto 1fr;
-    min-height: 100vh;
-  }
-
-  /* ── HEADER ── */
-  .header {
-    grid-column: 1 / -1;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 24px;
-    background: var(--bg-panel);
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap; gap: 10px;
-  }
-  .logo { display: flex; align-items: center; gap: 10px; }
-  .logo-icon { font-size: 1.8rem; animation: wiggle 3s ease-in-out infinite; }
-  @keyframes wiggle {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-8deg) scale(1.05); }
-    75% { transform: rotate(8deg) scale(1.05); }
-  }
-  .logo h1 {
-    font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 1.4rem;
-    background: linear-gradient(135deg, var(--cyan), var(--purple));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  }
-  .logo h1 span { -webkit-text-fill-color: var(--yellow); }
-
-  .header-right { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-  .stat-pill {
-    display: flex; align-items: center; gap: 6px;
-    font-family: 'Fredoka', sans-serif; font-size: 0.78rem; color: var(--text-dim);
-    background: var(--bg-card); padding: 5px 12px; border-radius: 999px;
-    border: 1px solid var(--border);
-  }
-  .stat-pill .val { font-weight: 600; }
-  .stat-pill.streak .val { color: var(--orange); }
-  .stat-pill.progress .val { color: var(--green); }
-  .progress-track {
-    width: 130px; height: 8px; background: var(--bg-deep);
-    border-radius: 999px; overflow: hidden; border: 1px solid var(--border);
-  }
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--cyan), var(--green));
-    border-radius: 999px;
-    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-    width: 0%;
-  }
-
-  /* ── SIDEBAR ── */
-  .sidebar {
-    background: var(--bg-panel);
-    border-right: 1px solid var(--border);
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-    padding-bottom: 20px;
-  }
-  .chapter-hdr {
-    display: flex; align-items: center; gap: 7px;
-    padding: 12px 16px 5px;
-    font-family: 'Fredoka', sans-serif; font-size: 0.7rem;
-    text-transform: uppercase; letter-spacing: 1.5px;
-    color: var(--text-dim); cursor: pointer; user-select: none;
-    transition: color 0.2s;
-  }
-  .chapter-hdr:hover { color: var(--text); }
-  .chapter-hdr .arrow {
-    font-size: 0.55rem;
-    transition: transform 0.25s;
-  }
-  .chapter-hdr.collapsed .arrow { transform: rotate(-90deg); }
-  .chapter-hdr .badge {
-    margin-left: auto; font-size: 0.85rem;
-    opacity: 0.15; transition: opacity 0.4s;
-  }
-  .chapter-hdr .badge.earned { opacity: 1; }
-  .ch-lessons {
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-  }
-  .chapter-hdr.collapsed + .ch-lessons { max-height: 0 !important; }
-
-  .lesson-btn {
-    display: flex; align-items: center; gap: 8px;
-    width: 100%; padding: 8px 16px 8px 26px;
-    background: none; border: none;
-    color: var(--text-dim);
-    font-family: 'Nunito', sans-serif; font-size: 0.8rem;
-    cursor: pointer; transition: all 0.15s;
-    text-align: left;
-    border-left: 3px solid transparent;
-  }
-  .lesson-btn:hover {
-    background: rgba(45, 226, 230, 0.06);
-    color: var(--text);
-  }
-  .lesson-btn.active {
-    background: rgba(45, 226, 230, 0.1);
-    color: var(--cyan);
-    border-left-color: var(--cyan);
-    font-weight: 700;
-  }
-  .lesson-btn.completed .check { color: var(--green); }
-  .lesson-btn.project .label { color: var(--yellow); opacity: 0.9; }
-  .lesson-btn.project.completed .label { color: var(--green); }
-  .lesson-btn .em { font-size: 0.95rem; width: 22px; text-align: center; flex-shrink: 0; }
-  .lesson-btn .label {
-    flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-  .lesson-btn .check {
-    margin-left: auto; font-size: 0.72rem; color: transparent; flex-shrink: 0;
-  }
-
-  .sandbox-link {
-    display: flex; align-items: center; gap: 8px;
-    width: calc(100% - 24px); margin: 14px 12px 0;
-    padding: 10px 14px;
-    background: linear-gradient(135deg, rgba(176,122,255,0.12), rgba(45,226,230,0.06));
-    border: 1px solid rgba(176,122,255,0.2);
-    border-radius: 10px;
-    color: var(--purple);
-    font-family: 'Fredoka', sans-serif; font-size: 0.82rem; font-weight: 600;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .sandbox-link:hover {
-    background: linear-gradient(135deg, rgba(176,122,255,0.22), rgba(45,226,230,0.1));
-    transform: translateY(-1px);
-  }
-  .sandbox-link.active {
-    border-color: var(--purple);
-    box-shadow: 0 0 14px rgba(176,122,255,0.12);
-  }
-
-  /* ── MAIN CONTENT ── */
-  .main { display: flex; flex-direction: column; overflow: hidden; }
-
-  .lesson-info {
-    padding: 16px 28px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg-panel);
-  }
-  .lesson-number {
-    font-family: 'Fredoka', sans-serif; font-size: 0.62rem;
-    text-transform: uppercase; letter-spacing: 2px;
-    color: var(--cyan); margin-bottom: 2px;
-  }
-  .lesson-title {
-    font-family: 'Fredoka', sans-serif;
-    font-size: 1.35rem; font-weight: 700;
-    color: var(--text); margin-bottom: 6px;
-  }
-  .lesson-desc {
-    color: var(--text-dim); line-height: 1.55;
-    font-size: 0.88rem; max-width: 720px;
-  }
-  .lesson-desc code {
-    font-family: 'Fira Code', monospace;
-    background: rgba(45,226,230,0.1);
-    padding: 1px 6px; border-radius: 4px;
-    font-size: 0.8rem; color: var(--cyan);
-  }
-  .concept-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
-  .chip {
-    font-family: 'Fira Code', monospace;
-    font-size: 0.68rem; padding: 2px 8px;
-    background: rgba(176,122,255,0.1);
-    color: var(--purple);
-    border-radius: 999px;
-    border: 1px solid rgba(176,122,255,0.18);
-  }
-
-  /* ── WORKSPACE ── */
-  .workspace {
-    flex: 1;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    overflow: hidden;
-  }
-  .editor-panel, .output-panel {
-    display: flex; flex-direction: column; overflow: hidden;
-  }
-  .editor-panel { border-right: 1px solid var(--border); }
-
-  .panel-bar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 6px 14px;
-    background: var(--bg-card);
-    border-bottom: 1px solid var(--border);
-    min-height: 40px;
-    flex-wrap: wrap; gap: 4px;
-  }
-  .panel-label {
-    font-family: 'Fredoka', sans-serif; font-size: 0.7rem;
-    text-transform: uppercase; letter-spacing: 1.5px;
-    color: var(--text-dim);
-  }
-  .bar-actions { display: flex; gap: 6px; }
-
-  .btn {
-    font-family: 'Fredoka', sans-serif;
-    font-size: 0.78rem; font-weight: 600;
-    padding: 5px 12px; border: none; border-radius: 8px;
-    cursor: pointer; transition: all 0.15s;
-    display: flex; align-items: center; gap: 5px;
-  }
-  .btn-run {
-    background: linear-gradient(135deg, var(--green), #0ad884);
-    color: #0a1a0f;
-  }
-  .btn-run:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(14,255,157,0.25);
-  }
-  .btn-run:disabled { opacity: 0.5; cursor: wait; transform: none; box-shadow: none; }
-  .btn-ghost {
-    background: rgba(255,255,255,0.06);
-    color: var(--text-dim);
-    border: 1px solid var(--border);
-  }
-  .btn-ghost:hover { background: rgba(255,255,255,0.1); color: var(--text); }
-  .btn-hint {
-    background: rgba(245,200,66,0.1);
-    color: var(--yellow);
-    border: 1px solid rgba(245,200,66,0.2);
-  }
-  .btn-hint:hover { background: rgba(245,200,66,0.18); }
-
-  /* CodeMirror */
-  .editor-wrap { flex: 1; overflow: auto; }
-  .editor-wrap .CodeMirror {
-    height: 100%;
-    font-family: 'Fira Code', monospace;
-    font-size: 0.88rem;
-    line-height: 1.6;
-    background: var(--bg-editor);
-  }
-  .CodeMirror-gutters {
-    background: var(--bg-editor) !important;
-    border-right: 1px solid var(--border) !important;
-  }
-  .CodeMirror-linenumber { color: var(--text-dim) !important; opacity: 0.4; }
-
-  /* Output */
-  .output-wrap {
-    flex: 1; overflow: auto;
-    padding: 14px 18px;
-    background: var(--bg-deep);
-  }
-  .output-line {
-    font-family: 'Fira Code', monospace;
-    font-size: 0.84rem; line-height: 1.65;
-    white-space: pre-wrap; word-break: break-word;
-  }
-  .output-line.stdout { color: var(--text); }
-  .output-line.stderr { color: var(--coral); }
-  .output-line.system { color: var(--text-dim); font-style: italic; }
-  .output-placeholder {
-    color: var(--text-dim);
-    font-family: 'Nunito', sans-serif;
-    font-size: 0.88rem;
-    text-align: center;
-    margin-top: 48px; opacity: 0.5;
-  }
-  .output-placeholder .big-emoji {
-    font-size: 2.2rem; display: block; margin-bottom: 8px;
-  }
-
-  /* Challenge & Hint boxes */
-  .challenge-box {
-    padding: 10px 16px;
-    background: rgba(245,200,66,0.05);
-    border-top: 1px solid rgba(245,200,66,0.12);
-    display: flex; align-items: flex-start; gap: 8px;
-  }
-  .challenge-box .icon { font-size: 0.95rem; flex-shrink: 0; margin-top: 2px; }
-  .challenge-box p {
-    font-size: 0.8rem; line-height: 1.45; color: var(--yellow);
-  }
-  .challenge-box p strong { color: #ffe066; }
-  .challenge-box code {
-    font-family: 'Fira Code', monospace;
-    background: rgba(245,200,66,0.1);
-    padding: 1px 5px; border-radius: 3px;
-    font-size: 0.76rem;
-  }
-  .hint-box {
-    padding: 10px 16px;
-    background: rgba(245,200,66,0.06);
-    border-top: 1px solid rgba(245,200,66,0.08);
-    display: none;
-  }
-  .hint-box.show { display: block; }
-  .hint-box p {
-    font-size: 0.78rem; line-height: 1.5;
-    color: var(--yellow); opacity: 0.8;
-  }
-  .hint-box code {
-    font-family: 'Fira Code', monospace;
-    background: rgba(245,200,66,0.1);
-    padding: 1px 5px; border-radius: 3px;
-    font-size: 0.74rem;
-  }
-
-  /* ── TOASTS ── */
-  .toast {
-    position: fixed; top: 18px; left: 50%; z-index: 1000;
-    transform: translateX(-50%) translateY(-120px);
-    border-radius: 14px; padding: 14px 22px;
-    display: flex; align-items: center; gap: 10px;
-    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .toast.show { transform: translateX(-50%) translateY(0); }
-  .toast-success {
-    background: linear-gradient(135deg, var(--bg-card), #162016);
-    border: 2px solid var(--green);
-    box-shadow: 0 6px 30px rgba(14,255,157,0.15);
-  }
-  .toast-success .toast-msg {
-    font-family: 'Fredoka', sans-serif;
-    font-size: 1rem; color: var(--green); font-weight: 600;
-  }
-  .toast-badge {
-    flex-direction: column;
-    background: linear-gradient(135deg, #261842, #181335);
-    border: 2px solid var(--purple);
-    box-shadow: 0 8px 40px rgba(176,122,255,0.2);
-    z-index: 1001;
-    transform: translateX(-50%) translateY(-140px) scale(0.8);
-  }
-  .toast-badge.show { transform: translateX(-50%) translateY(0) scale(1); }
-  .toast-badge .badge-icon { font-size: 2.4rem; }
-  .toast-badge .badge-title {
-    font-family: 'Fredoka', sans-serif;
-    font-size: 1.05rem; color: var(--purple); font-weight: 700;
-  }
-  .toast-badge .badge-sub { font-size: 0.78rem; color: var(--text-dim); }
-
-  /* Confetti */
-  .confetti-box {
-    position: fixed; inset: 0;
-    pointer-events: none; z-index: 998; overflow: hidden;
-  }
-  .confetti-bit {
-    position: absolute; top: -12px;
-    border-radius: 2px;
-    animation: fall linear forwards;
-  }
-  @keyframes fall {
-    to { transform: translateY(105vh) rotate(720deg); opacity: 0; }
-  }
-
-  /* ── LOADING ── */
-  .loading {
-    position: fixed; inset: 0;
-    background: var(--bg-deep);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    z-index: 9999;
-    transition: opacity 0.5s, visibility 0.5s;
-  }
-  .loading.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-  .loading-icon { font-size: 3.5rem; animation: bob 1s ease-in-out infinite; }
-  @keyframes bob {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-14px); }
-  }
-  .loading h2 {
-    font-family: 'Fredoka', sans-serif;
-    font-size: 1.15rem; color: var(--cyan); margin-top: 14px;
-  }
-  .loading p {
-    font-size: 0.82rem; color: var(--text-dim); margin-top: 4px;
-    text-align: center; max-width: 340px;
-  }
-
-  /* ── RESPONSIVE ── */
-  .menu-btn {
-    display: none; align-items: center; justify-content: center;
-    width: 34px; height: 34px;
-    background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 8px; cursor: pointer; color: var(--text); font-size: 1.1rem;
-  }
-  @media (max-width: 900px) {
-    .app { grid-template-columns: 1fr; }
-    .sidebar {
-      display: none; position: fixed; inset: 0;
-      z-index: 100; padding-top: 54px;
-    }
-    .sidebar.open { display: block; }
-    .workspace {
-      grid-template-columns: 1fr;
-      grid-template-rows: 1fr 1fr;
-    }
-    .editor-panel { border-right: none; border-bottom: 1px solid var(--border); }
-    .menu-btn { display: flex !important; }
-  }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0b0a1a;--panel:#131225;--card:#1c1b36;--editor:#1e1d3a;--cyan:#2de2e6;--yellow:#f5c842;--green:#0eff9d;--coral:#ff4f7b;--purple:#b07aff;--orange:#ff9f43;--text:#e8e6f0;--dim:#8280a0;--border:#2a2950}
+html{font-size:15px}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(1.4px 1.4px at 18% 28%,rgba(45,226,230,.3),transparent),radial-gradient(1px 1px at 42% 72%,rgba(176,122,255,.25),transparent),radial-gradient(1.2px 1.2px at 62% 18%,rgba(245,200,66,.2),transparent),radial-gradient(1px 1px at 82% 58%,rgba(14,255,157,.2),transparent);pointer-events:none;z-index:0}
+.app{position:relative;z-index:1;display:grid;grid-template-columns:260px 1fr;grid-template-rows:auto 1fr;min-height:100vh}
+.header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:var(--panel);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px}
+.logo{display:flex;align-items:center;gap:8px}
+.logo-icon{font-size:1.6rem;animation:wiggle 3s ease-in-out infinite}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+.logo h1{font-family:'Fredoka',sans-serif;font-weight:700;font-size:1.3rem;background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.logo h1 span{-webkit-text-fill-color:var(--yellow)}
+.hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pill{display:flex;align-items:center;gap:5px;font-family:'Fredoka',sans-serif;font-size:.72rem;color:var(--dim);background:var(--card);padding:4px 10px;border-radius:999px;border:1px solid var(--border)}
+.pill .v{font-weight:600}
+.pill.streak .v{color:var(--orange)}
+.pill.prog .v{color:var(--green)}
+.pbar{width:110px;height:8px;background:var(--bg);border-radius:999px;overflow:hidden;border:1px solid var(--border)}
+.pfill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:999px;transition:width .6s;width:0%}
+.sidebar{background:var(--panel);border-right:1px solid var(--border);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent;padding-bottom:16px}
+.ch-hdr{display:flex;align-items:center;gap:6px;padding:10px 14px 4px;font-family:'Fredoka',sans-serif;font-size:.66rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--dim);cursor:pointer;user-select:none}
+.ch-hdr:hover{color:var(--text)}
+.ch-hdr .ar{font-size:.5rem;transition:transform .2s}
+.ch-hdr.col .ar{transform:rotate(-90deg)}
+.ch-hdr .bdg{margin-left:auto;font-size:.8rem;opacity:.15;transition:opacity .3s}
+.ch-hdr .bdg.on{opacity:1}
+.ch-ls{overflow:hidden;transition:max-height .3s}
+.ch-hdr.col+.ch-ls{max-height:0!important}
+.lbtn{display:flex;align-items:center;gap:6px;width:100%;padding:7px 12px 7px 22px;background:none;border:none;color:var(--dim);font-family:'Nunito',sans-serif;font-size:.77rem;cursor:pointer;transition:all .15s;text-align:left;border-left:3px solid transparent}
+.lbtn:hover{background:rgba(45,226,230,.06);color:var(--text)}
+.lbtn.act{background:rgba(45,226,230,.1);color:var(--cyan);border-left-color:var(--cyan);font-weight:700}
+.lbtn.done .ck{color:var(--green)}
+.lbtn.prj .lb{color:var(--yellow);opacity:.9}
+.lbtn .em{font-size:.9rem;width:20px;text-align:center;flex-shrink:0}
+.lbtn .lb{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lbtn .ck{margin-left:auto;font-size:.68rem;color:transparent;flex-shrink:0}
+.sbx-btn{display:flex;align-items:center;gap:7px;width:calc(100% - 18px);margin:10px 9px 0;padding:8px 11px;background:linear-gradient(135deg,rgba(176,122,255,.1),rgba(45,226,230,.06));border:1px solid rgba(176,122,255,.18);border-radius:8px;color:var(--purple);font-family:'Fredoka',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s}
+.sbx-btn:hover{background:linear-gradient(135deg,rgba(176,122,255,.18),rgba(45,226,230,.1))}
+.sbx-btn.act{border-color:var(--purple);box-shadow:0 0 10px rgba(176,122,255,.1)}
+.main{display:flex;flex-direction:column;overflow:hidden}
+.linfo{padding:14px 22px;border-bottom:1px solid var(--border);background:var(--panel)}
+.lnum{font-family:'Fredoka',sans-serif;font-size:.6rem;text-transform:uppercase;letter-spacing:1.8px;color:var(--cyan)}
+.ltitle{font-family:'Fredoka',sans-serif;font-size:1.25rem;font-weight:700;color:var(--text);margin:2px 0 4px}
+.ldesc{color:var(--dim);line-height:1.5;font-size:.84rem;max-width:700px}
+.ldesc code{font-family:'Fira Code',monospace;background:rgba(45,226,230,.1);padding:1px 5px;border-radius:4px;font-size:.78rem;color:var(--cyan)}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.chip{font-family:'Fira Code',monospace;font-size:.64rem;padding:2px 7px;background:rgba(176,122,255,.1);color:var(--purple);border-radius:999px;border:1px solid rgba(176,122,255,.15)}
+.workspace{flex:1;display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
+.ed-panel,.out-panel{display:flex;flex-direction:column;overflow:hidden}
+.ed-panel{border-right:1px solid var(--border)}
+.pbar2{display:flex;align-items:center;justify-content:space-between;padding:5px 10px;background:var(--card);border-bottom:1px solid var(--border);min-height:36px;flex-wrap:wrap;gap:3px}
+.plbl{font-family:'Fredoka',sans-serif;font-size:.66rem;text-transform:uppercase;letter-spacing:1.3px;color:var(--dim)}
+.acts{display:flex;gap:5px}
+.btn{font-family:'Fredoka',sans-serif;font-size:.74rem;font-weight:600;padding:4px 10px;border:none;border-radius:7px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:4px}
+.btn-run{background:linear-gradient(135deg,var(--green),#0ad884);color:#0a1a0f}
+.btn-run:hover{transform:translateY(-1px);box-shadow:0 3px 12px rgba(14,255,157,.2)}
+.btn-run:disabled{opacity:.5;cursor:wait;transform:none;box-shadow:none}
+.btn-g{background:rgba(255,255,255,.06);color:var(--dim);border:1px solid var(--border)}
+.btn-g:hover{background:rgba(255,255,255,.1);color:var(--text)}
+.btn-h{background:rgba(245,200,66,.1);color:var(--yellow);border:1px solid rgba(245,200,66,.18)}
+.btn-h:hover{background:rgba(245,200,66,.16)}
+.ed-wrap{flex:1;overflow:auto}
+.ed-wrap .CodeMirror{height:100%;font-family:'Fira Code',monospace;font-size:.84rem;line-height:1.55;background:var(--editor)}
+.CodeMirror-gutters{background:var(--editor)!important;border-right:1px solid var(--border)!important}
+.CodeMirror-linenumber{color:var(--dim)!important;opacity:.4}
+.canvas-wrap{display:none;border-bottom:1px solid var(--border);background:#111;text-align:center;padding:6px}
+.canvas-wrap canvas{border-radius:6px;display:block;margin:0 auto;max-width:100%;image-rendering:pixelated}
+.out-wrap{flex:1;overflow:auto;padding:10px 14px;background:var(--bg)}
+.ol{font-family:'Fira Code',monospace;font-size:.8rem;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.ol.so{color:var(--text)}.ol.se{color:var(--coral)}.ol.sy{color:var(--dim);font-style:italic}
+.oph{color:var(--dim);font-family:'Nunito',sans-serif;font-size:.82rem;text-align:center;margin-top:36px;opacity:.5}
+.oph .be{font-size:2rem;display:block;margin-bottom:6px}
+.cbox{padding:8px 12px;background:rgba(245,200,66,.04);border-top:1px solid rgba(245,200,66,.1);display:flex;align-items:flex-start;gap:6px}
+.cbox .ci{font-size:.85rem;flex-shrink:0;margin-top:2px}
+.cbox p{font-size:.76rem;line-height:1.4;color:var(--yellow)}
+.cbox p strong{color:#ffe066}
+.cbox code{font-family:'Fira Code',monospace;background:rgba(245,200,66,.08);padding:1px 4px;border-radius:3px;font-size:.72rem}
+.hbox{padding:8px 12px;background:rgba(245,200,66,.05);border-top:1px solid rgba(245,200,66,.06);display:none}
+.hbox.show{display:block}
+.hbox p{font-size:.74rem;line-height:1.4;color:var(--yellow);opacity:.8}
+.hbox code{font-family:'Fira Code',monospace;background:rgba(245,200,66,.08);padding:1px 4px;border-radius:3px;font-size:.72rem}
+.toast{position:fixed;top:14px;left:50%;z-index:1000;transform:translateX(-50%) translateY(-110px);border-radius:12px;padding:12px 20px;display:flex;align-items:center;gap:8px;transition:transform .5s cubic-bezier(.22,1,.36,1)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast-s{background:linear-gradient(135deg,var(--card),#162016);border:2px solid var(--green);box-shadow:0 4px 20px rgba(14,255,157,.15)}
+.toast-s .tm{font-family:'Fredoka',sans-serif;font-size:.92rem;color:var(--green);font-weight:600}
+.toast-b{flex-direction:column;background:linear-gradient(135deg,#261842,#181335);border:2px solid var(--purple);box-shadow:0 6px 30px rgba(176,122,255,.2);z-index:1001;transform:translateX(-50%) translateY(-130px) scale(.8)}
+.toast-b.show{transform:translateX(-50%) translateY(0) scale(1)}
+.toast-b .bi{font-size:2rem}.toast-b .bt{font-family:'Fredoka',sans-serif;font-size:1rem;color:var(--purple);font-weight:700}.toast-b .bs{font-size:.72rem;color:var(--dim)}
+.confetti-box{position:fixed;inset:0;pointer-events:none;z-index:998;overflow:hidden}
+.cb{position:absolute;top:-10px;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:0}}
+.loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .5s,visibility .5s}
+.loading.hid{opacity:0;visibility:hidden;pointer-events:none}
+.loading-i{font-size:3rem;animation:bob 1s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.loading h2{font-family:'Fredoka',sans-serif;font-size:1rem;color:var(--cyan);margin-top:12px}
+.loading p{font-size:.78rem;color:var(--dim);margin-top:4px;text-align:center;max-width:300px}
+.mbtn{display:none;align-items:center;justify-content:center;width:32px;height:32px;background:var(--card);border:1px solid var(--border);border-radius:7px;cursor:pointer;color:var(--text);font-size:1rem}
+@media(max-width:900px){.app{grid-template-columns:1fr}.sidebar{display:none;position:fixed;inset:0;z-index:100;padding-top:48px}.sidebar.open{display:block}.workspace{grid-template-columns:1fr;grid-template-rows:1fr 1fr}.ed-panel{border-right:none;border-bottom:1px solid var(--border)}.mbtn{display:flex!important}}
 </style>
 </head>
 <body>
-
-<!-- Loading -->
-<div class="loading" id="loadingScreen">
-  <div class="loading-icon">🐍</div>
-  <h2>Summoning Python...</h2>
-  <p>Loading the Python engine in your browser — first visit takes a few seconds!</p>
-</div>
-
-<!-- Toasts -->
-<div class="toast toast-success" id="successToast">
-  <span style="font-size:1.4rem">🎉</span>
-  <span class="toast-msg" id="successMsg">Mission Complete!</span>
-</div>
-<div class="toast toast-badge" id="badgeToast">
-  <span class="badge-icon" id="badgeIcon">🏅</span>
-  <span class="badge-title" id="badgeTitle">Chapter Complete!</span>
-  <span class="badge-sub" id="badgeSub">You earned a badge!</span>
-</div>
-<div class="confetti-box" id="confettiBox"></div>
-
-<!-- App Shell -->
+<div class="loading" id="ld"><div class="loading-i">🐍</div><h2>Summoning Python...</h2><p>Loading the Python engine — first visit takes a few seconds!</p></div>
+<div class="toast toast-s" id="sToast"><span style="font-size:1.3rem">🎉</span><span class="tm" id="sMsg">Mission Complete!</span></div>
+<div class="toast toast-b" id="bToast"><span class="bi" id="bI">🏅</span><span class="bt" id="bT">Chapter Complete!</span><span class="bs" id="bS"></span></div>
+<div class="confetti-box" id="cBox"></div>
 <div class="app">
-
-  <header class="header">
-    <div class="logo">
-      <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-      <span class="logo-icon">🐍</span>
-      <h1>Python <span>Quest</span></h1>
-    </div>
-    <div class="header-right">
-      <div class="stat-pill streak">🔥 <span class="val" id="streakVal">0</span> day streak</div>
-      <div class="stat-pill progress">
-        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-        <span class="val" id="progressVal">0/30</span>
-      </div>
-    </div>
-  </header>
-
-  <nav class="sidebar" id="sidebar">
-    <div id="sidebarContent"></div>
-    <button class="sandbox-link" id="sandboxLink" onclick="loadSandbox()">
-      🎨 Free Play Sandbox
-    </button>
-  </nav>
-
-  <main class="main">
-    <div class="lesson-info">
-      <div class="lesson-number" id="lessonNum"></div>
-      <h2 class="lesson-title" id="lessonTitle"></h2>
-      <p class="lesson-desc" id="lessonDesc"></p>
-      <div class="concept-chips" id="chips"></div>
-    </div>
-
-    <div class="workspace">
-      <div class="editor-panel">
-        <div class="panel-bar">
-          <span class="panel-label">📝 Your Code</span>
-          <div class="bar-actions">
-            <button class="btn btn-hint" id="hintBtn" onclick="toggleHint()">💡 Hint</button>
-            <button class="btn btn-ghost" onclick="resetCode()">↺ Reset</button>
-            <button class="btn btn-run" id="runBtn" onclick="runCode()">▶ Run</button>
-          </div>
-        </div>
-        <div class="hint-box" id="hintBox"><p id="hintText"></p></div>
-        <div class="challenge-box" id="challengeBox">
-          <span class="icon">🎯</span>
-          <p id="challengeText"></p>
-        </div>
-        <div class="editor-wrap"><textarea id="editorArea"></textarea></div>
-      </div>
-
-      <div class="output-panel">
-        <div class="panel-bar">
-          <span class="panel-label">📺 Output</span>
-          <div class="bar-actions">
-            <button class="btn btn-ghost" onclick="clearOutput()">Clear</button>
-          </div>
-        </div>
-        <div class="output-wrap" id="outputWrap">
-          <div class="output-placeholder">
-            <span class="big-emoji">👆</span>
-            Hit <strong>▶ Run</strong> to see your code come to life!
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
-
+<header class="header">
+<div class="logo"><button class="mbtn" onclick="document.getElementById('sb').classList.toggle('open')">☰</button><span class="logo-icon">🐍</span><h1>Python <span>Quest</span></h1></div>
+<div class="hdr-right"><div class="pill streak">🔥 <span class="v" id="stk">0</span> day streak</div><div class="pill prog"><div class="pbar"><div class="pfill" id="pf"></div></div><span class="v" id="pv">0/30</span></div></div>
+</header>
+<nav class="sidebar" id="sb"><div id="sl"></div><button class="sbx-btn" id="sbxb" onclick="loadSandbox()">🎨 Free Play Sandbox</button></nav>
+<main class="main">
+<div class="linfo"><div class="lnum" id="ln"></div><h2 class="ltitle" id="lt"></h2><p class="ldesc" id="ld2"></p><div class="chips" id="ch"></div></div>
+<div class="workspace">
+<div class="ed-panel">
+<div class="pbar2"><span class="plbl">📝 Code</span><div class="acts"><button class="btn btn-h" id="hb" onclick="toggleHint()">💡 Hint</button><button class="btn btn-g" onclick="resetCode()">↺ Reset</button><button class="btn btn-run" id="rb" onclick="runCode()">▶ Run</button></div></div>
+<div class="hbox" id="hBox"><p id="hT"></p></div>
+<div class="cbox" id="cBox2"><span class="ci">🎯</span><p id="cT"></p></div>
+<div class="ed-wrap"><textarea id="ea"></textarea></div>
 </div>
-
-<!-- External Libraries -->
+<div class="out-panel">
+<div class="pbar2"><span class="plbl">📺 Output</span><div class="acts"><button class="btn btn-g" onclick="clearOutput()">Clear</button></div></div>
+<div class="canvas-wrap" id="cw"><canvas id="cv" width="400" height="300"></canvas></div>
+<div class="out-wrap" id="ow"><div class="oph"><span class="be">👆</span>Hit <strong>▶ Run</strong> to see your code come to life!</div></div>
+</div>
+</div>
+</main>
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
 <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
-
 <script>
-// ══════════════════════════════════════════════════════════
-//  CHAPTER DEFINITIONS
-// ══════════════════════════════════════════════════════════
-const CHAPTERS = [
-  { name: "First Steps",       badge: "🌱" },
-  { name: "Decisions & Loops", badge: "🔄" },
-  { name: "Collections",       badge: "📦" },
-  { name: "Functions",         badge: "🏗️" },
-  { name: "Level Up",          badge: "⚡" },
-  { name: "Boss Level",        badge: "👑" },
+
+var CHAPTERS=[
+{name:"First Steps",badge:"🌱"},{name:"Decisions & Loops",badge:"🔄"},
+{name:"Collections",badge:"📦"},{name:"Functions",badge:"🏗️"},
+{name:"Level Up",badge:"⚡"},{name:"Boss Level",badge:"👑"}
 ];
-
-// ══════════════════════════════════════════════════════════
-//  ALL 30 LESSONS
-// ══════════════════════════════════════════════════════════
-const LESSONS = [
-
-// ─── CHAPTER 0 · FIRST STEPS ─────────────────────────────
-
-{ ch:0, title:"Say Hello!", emoji:"👋", concepts:["print()"],
-  desc:'Every coder\'s first program! The <code>print()</code> command tells Python to display text on screen. Put your message inside quote marks and parentheses.',
-  code:'# Your first Python program!\n# Click the green ▶ Run button to see it work\n\nprint("Hello, World!")\nprint("Python is awesome!")\nprint("I am learning to code!")\n',
-  challenge:'<strong>Mission:</strong> Change all three messages to say something about YOU — your name, your favorite thing, and what you want to build with Python.',
-  hint:'Replace the text inside the quotes with your own words. Keep the quote marks! Example: <code>print("Hi, I\'m Alex and I love video games!")</code>',
-  check: function(o) { return o.trim().toLowerCase() !== "hello, world!\npython is awesome!\ni am learning to code!" && o.trim().length > 10; }
-},
-
-{ ch:0, title:"Comments & Notes", emoji:"💬", concepts:["# comment"],
-  desc:'Comments are notes for humans — Python completely ignores them. Start a comment with <code>#</code>. Good programmers write comments to explain <em>why</em> their code works.',
-  code:'# This is a comment — Python skips it!\nprint("This line runs")  # comments can go here too\n\n# You can "comment out" code to disable it:\n# print("This will NOT run")\nprint("But this will!")\n\n# Use comments to explain your thinking:\n# Calculate the number of hours in a week\nhours_per_day = 24\ndays_per_week = 7\nhours_per_week = hours_per_day * days_per_week\nprint(f"Hours in a week: {hours_per_week}")\n',
-  challenge:'<strong>Mission:</strong> Write a program that calculates something interesting (your age in days, minutes in a year, etc). Add at least 3 helpful comments explaining your code.',
-  hint:'Try: <code># Calculate my age in days</code> then <code>age_years = 12</code> and <code>age_days = age_years * 365</code>. Comment each step!',
-  check: function(o) { return o.trim().length > 0; }
-},
-
-{ ch:0, title:"Variables", emoji:"📦", concepts:["variables", "=", "int", "str", "float"],
-  desc:'Variables are like labeled boxes where you store information. Pick a name, use <code>=</code> to put a value in. Python has different types: <strong>strings</strong> (text in quotes), <strong>integers</strong> (whole numbers), and <strong>floats</strong> (decimals).',
-  code:'# Create some variables\nname = "Python"\nversion = 3\npi = 3.14159\n\n# Print them\nprint(name)\nprint(version)\nprint(pi)\n\n# Check what type each variable is\nprint(type(name))      # str (string = text)\nprint(type(version))   # int (integer = whole number)\nprint(type(pi))        # float (decimal number)\n\n# Variables can change!\nname = "Python Quest"\nprint(name)\n',
-  challenge:'<strong>Mission:</strong> Create variables for <code>my_name</code> (text), <code>my_age</code> (number), and <code>favorite_food</code> (text). Print all three and print their types.',
-  hint:'Text needs quotes: <code>my_name = "Alex"</code>. Numbers don\'t: <code>my_age = 12</code>. Check type with <code>print(type(my_name))</code>.',
-  check: function(o) { return o.trim().split('\n').filter(function(l){return l.trim();}).length >= 4; }
-},
-
-{ ch:0, title:"Math & Strings", emoji:"🔢", concepts:["+", "-", "*", "/", "**", "f-string", "len()"],
-  desc:'Python is a super-calculator! Use <code>+</code> add, <code>-</code> subtract, <code>*</code> multiply, <code>/</code> divide, <code>**</code> power, <code>%</code> remainder. <strong>f-strings</strong> let you mix variables into text: <code>f"Hi {name}"</code>. Measure text length with <code>len()</code>.',
-  code:'# Math operators\nprint(6 * 7)         # 42\nprint(2 ** 10)       # 1024 (2 to the power of 10)\nprint(17 % 5)        # 2 (remainder)\nprint((2 + 3) * 4)   # 20 (parentheses first)\n\n# f-strings — the best way to mix text and variables\nname = "Coder"\nage = 12\nprint(f"Hi, I\'m {name} and I\'m {age} years old!")\nprint(f"Next year I\'ll be {age + 1}!")\n\n# String tricks\nprint("ha" * 5)              # hahahahaha\nprint("HELLO".lower())       # hello\nprint("hello".upper())       # HELLO\nprint(len("Python Quest"))   # 12 characters\n',
-  challenge:'<strong>Mission:</strong> Calculate how many seconds are in a day (24 × 60 × 60) and how many seconds in a year. Use f-strings to print both answers in nice sentences. Also print your name in ALL CAPS.',
-  hint:'<code>day_secs = 24 * 60 * 60</code>, <code>year_secs = day_secs * 365</code>. Print with <code>f"Seconds in a day: {day_secs}"</code>.',
-  check: function(o) { return o.includes("86400"); }
-},
-
-{ ch:0, title:"🎮 Mad Libs!", emoji:"🎭", project:true, concepts:["variables", "print()", "f-strings"],
-  desc:'Time for your first project! Mad Libs is a word game where you fill in blanks to create a hilarious story. Use everything you\'ve learned: variables, f-strings, and print statements.',
-  code:'# ═══ MAD LIBS STORY GENERATOR ═══\n# Change ALL the variables below to make your own story!\n\nanimal = "dinosaur"\ncolor = "purple"\nfood = "pizza"\nnumber = 42\nverb_ing = "dancing"\nadjective = "sparkly"\nplace = "the moon"\nsuperpower = "invisibility"\n\nprint("╔══════════════════════════════════╗")\nprint("║   THE WORLD\'S SILLIEST STORY    ║")\nprint("╚══════════════════════════════════╝")\nprint()\nprint(f"Once upon a time, a {color} {animal}")\nprint(f"went on a quest to {place}.")\nprint(f"It brought {number} pieces of {adjective} {food}")\nprint(f"and a secret power: {superpower}!")\nprint()\nprint(f"When it arrived, everyone was {verb_ing}.")\nprint(f"The {animal} joined in, and they all ate")\nprint(f"{food} until the {color} sun set.")\nprint()\nprint("THE END 🎬")\n',
-  challenge:'<strong>Project:</strong> Change ALL the variables to make YOUR own hilarious story. Then add at least 3 new variables (like <code>friend_name</code>, <code>vehicle</code>, <code>silly_sound</code>) and make the story at least 5 lines longer!',
-  hint:'Add variables like <code>friend = "Bob"</code> or <code>vehicle = "rocket skateboard"</code> and weave them into more f-string print lines.',
-  check: function(o) { return o.split('\n').filter(function(l){return l.trim();}).length >= 10; }
-},
-
-// ─── CHAPTER 1 · DECISIONS & LOOPS ──────────────────────
-
-{ ch:1, title:"If / Else", emoji:"🤔", concepts:["if", "elif", "else", "==", ">", "<"],
-  desc:'Programs can make decisions! Use <code>if</code> to check a condition, <code>elif</code> (else if) for additional checks, and <code>else</code> as a fallback. <strong>Important:</strong> the code inside must be indented with 4 spaces.',
-  code:'temperature = 85\n\nif temperature > 90:\n    print("🔥 Super hot! Stay hydrated!")\nelif temperature > 70:\n    print("☀️ Nice and warm outside!")\nelif temperature > 50:\n    print("🧥 A bit chilly — grab a jacket.")\nelse:\n    print("🥶 Brrr! It\'s freezing!")\n\nprint(f"The temperature is {temperature}°F")\n\n# Comparison operators:\n# ==  equals           !=  not equals\n# >   greater than     <   less than\n# >=  greater/equal    <=  less/equal\n',
-  challenge:'<strong>Mission:</strong> Create a <code>score</code> variable (0-100). Write if/elif/else to print "A" for 90+, "B" for 80+, "C" for 70+, "D" for 60+, and "F" for below 60.',
-  hint:'Start with <code>score = 85</code>. Then <code>if score >= 90:</code> followed by indented <code>print("A")</code>, then <code>elif score >= 80:</code> and so on.',
-  check: function(o) { var u = o.trim().toUpperCase(); return "ABCDF".split('').some(function(g){ return u.includes(g); }); }
-},
-
-{ ch:1, title:"Logic Operators", emoji:"🧠", concepts:["and", "or", "not", "True", "False"],
-  desc:'Combine conditions with <code>and</code> (both must be true), <code>or</code> (at least one true), and <code>not</code> (flips true to false). These let you build complex decision-making!',
-  code:'age = 12\nheight_inches = 52\n\n# AND — both conditions must be true\nif age >= 10 and height_inches >= 48:\n    print("✅ You can ride the roller coaster!")\nelse:\n    print("❌ Sorry, not yet!")\n\n# OR — at least one must be true\nday = "Saturday"\nif day == "Saturday" or day == "Sunday":\n    print("🎉 It\'s the weekend!")\nelse:\n    print("📚 School day.")\n\n# NOT — flips the result\nis_raining = False\nif not is_raining:\n    print("☀️ Great weather! Let\'s go outside!")\nelse:\n    print("🌧️ Better stay in and code!")\n',
-  challenge:'<strong>Mission:</strong> Create variables for <code>has_ticket</code> (True/False), <code>age</code>, and <code>is_vip</code>. Write rules: you can enter if you have a ticket AND are 13+, OR if you\'re a VIP (any age).',
-  hint:'<code>if (has_ticket and age >= 13) or is_vip:</code> — parentheses help group the AND condition.',
-  check: function(o) { return o.trim().length > 5; }
-},
-
-{ ch:1, title:"For Loops", emoji:"🔁", concepts:["for", "range()", "in"],
-  desc:'Loops repeat code without you typing it over and over! <code>for</code> loops go through a sequence of items one at a time. <code>range(5)</code> gives numbers 0,1,2,3,4. <code>range(1,6)</code> gives 1,2,3,4,5.',
-  code:'# Count from 0 to 4\nfor i in range(5):\n    print(f"Count: {i}")\n\nprint("---")\n\n# Multiplication table\nfor num in range(1, 6):\n    print(f"{num} x 7 = {num * 7}")\n\nprint("---")\n\n# Loop through a string\nfor letter in "PYTHON":\n    print(letter, end=" ")\nprint()  # new line at the end\n\n# Nested math in loops\nfor i in range(1, 4):\n    print(f"{i} squared = {i**2}, cubed = {i**3}")\n',
-  challenge:'<strong>Mission:</strong> Use a for loop to print a triangle of stars like this:<br><code>*</code><br><code>**</code><br><code>***</code><br><code>****</code><br><code>*****</code><br>(Hint: <code>"*" * 3</code> gives <code>"***"</code>)',
-  hint:'<code>for i in range(1, 6):</code> then inside the loop: <code>print("*" * i)</code>',
-  check: function(o) { return o.includes("*") && o.includes("*****"); }
-},
-
-{ ch:1, title:"While Loops", emoji:"⏳", concepts:["while", "break", "+=", "-="],
-  desc:'A <code>while</code> loop keeps running as long as a condition is True. Perfect for countdowns and accumulating totals! Use <code>break</code> to exit early. Be careful — if the condition never becomes False, it loops forever!',
-  code:'# Countdown!\ncountdown = 5\nwhile countdown > 0:\n    print(f"{countdown}...")\n    countdown -= 1    # subtract 1 each time\nprint("🚀 Liftoff!")\n\nprint("---")\n\n# Adding up numbers\ntotal = 0\nn = 1\nwhile n <= 10:\n    total += n    # add n to total\n    n += 1        # move to next number\nprint(f"Sum of 1 through 10 = {total}")\n',
-  challenge:'<strong>Mission:</strong> Start with <code>power = 1</code>. Use a while loop to keep doubling it (<code>power *= 2</code>). Print each value. Stop when you find the first power of 2 that\'s bigger than 1000.',
-  hint:'<code>power = 1</code>, then <code>while power <= 1000:</code> with <code>print(power)</code> and <code>power *= 2</code> inside. After the loop, print the final answer.',
-  check: function(o) { return o.includes("1024"); }
-},
-
-{ ch:1, title:"🎮 Guessing Game", emoji:"🎲", project:true, concepts:["if", "while", "random", "break"],
-  desc:'Project time! Build a number guessing game using if/else for checking, a while loop to keep playing, and the <code>random</code> module to pick a secret number.',
-  code:'import random\n\nprint("🎲 NUMBER GUESSING GAME 🎲")\nprint("I\'m thinking of a number between 1 and 20.")\nprint("You have 5 tries. Good luck!\\n")\n\nsecret = random.randint(1, 20)\nattempts = 0\nmax_tries = 5\n\nwhile attempts < max_tries:\n    # Simulating a guess (since we can\'t type input in browser)\n    guess = random.randint(1, 20)\n    attempts += 1\n    print(f"Try {attempts}: You guessed {guess}")\n\n    if guess == secret:\n        print(f"\\n🎉 YES! The number was {secret}!")\n        print(f"You got it in {attempts} tries!")\n        break\n    elif guess < secret:\n        print("   ⬆️ Too low! Go higher.")\n    else:\n        print("   ⬇️ Too high! Go lower.")\nelse:\n    print(f"\\n😅 Out of tries! The number was {secret}.")\n\nprint("\\nThanks for playing!")\n',
-  challenge:'<strong>Project:</strong> Make it your own! Ideas: change range to 1-100 with more tries, add a scoring system (fewer guesses = higher score), or print a rating based on performance.',
-  hint:'For scoring: <code>if attempts == 1: print("🌟 LEGENDARY!")</code>. For bigger range, change <code>randint(1, 20)</code> to <code>randint(1, 100)</code> and bump <code>max_tries</code> to 7.',
-  check: function(o) { return o.length > 100; }
-},
-
-// ─── CHAPTER 2 · COLLECTIONS ────────────────────────────
-
-{ ch:2, title:"Lists", emoji:"📋", concepts:["list", "[]", "append()", "len()", "indexing"],
-  desc:'Lists store multiple items in one variable — like a playlist or a team roster! Items are numbered starting at <strong>0</strong> (not 1). Use <code>.append()</code> to add items and <code>len()</code> to count them.',
-  code:'# Create a list\nfruits = ["apple", "banana", "cherry", "mango"]\n\nprint(fruits)        # the whole list\nprint(fruits[0])     # first item: apple\nprint(fruits[-1])    # last item: mango\nprint(len(fruits))   # how many: 4\n\n# Add an item\nfruits.append("grape")\nprint(f"After append: {fruits}")\n\n# Change an item\nfruits[1] = "blueberry"\nprint(f"After change: {fruits}")\n\n# Loop through the list\nfor fruit in fruits:\n    print(f"  🍎 I like {fruit}!")\n',
-  challenge:'<strong>Mission:</strong> Create a list of your 5+ favorite things (games, movies, songs). Print the count. Add one more with <code>.append()</code>. Then use <code>enumerate</code> to print each with a number.',
-  hint:'<code>for i, item in enumerate(my_list, 1):</code> gives you numbered items. Try <code>print(f"{i}. {item}")</code>.',
-  check: function(o) { return o.trim().split('\n').filter(function(l){return l.trim();}).length >= 6; }
-},
-
-{ ch:2, title:"List Superpowers", emoji:"🛠️", concepts:[".sort()", ".reverse()", ".pop()", "max()", "min()", "sum()"],
-  desc:'Lists have tons of built-in methods! <code>.sort()</code> puts items in order, <code>.reverse()</code> flips them, <code>.pop()</code> removes the last item. Use <code>max()</code>, <code>min()</code>, and <code>sum()</code> for number lists.',
-  code:'scores = [85, 92, 78, 95, 88, 73, 91]\nprint(f"Original: {scores}")\n\n# Sort and reverse\nscores.sort()\nprint(f"Sorted:   {scores}")\nscores.reverse()\nprint(f"Reversed: {scores}")\n\n# Remove items\nlast = scores.pop()       # removes & returns last item\nprint(f"Popped {last}, now: {scores}")\n\nscores.remove(78)         # removes first occurrence of 78\nprint(f"Removed 78: {scores}")\n\n# Number crunching\nprint(f"Highest: {max(scores)}")\nprint(f"Lowest:  {min(scores)}")\nprint(f"Total:   {sum(scores)}")\nprint(f"Average: {sum(scores) / len(scores):.1f}")\n\n# Check if something is in the list\nif 92 in scores:\n    print("92 is in the list!")\n',
-  challenge:'<strong>Mission:</strong> Create a list of 8 random test scores. Sort them, print the highest and lowest, the average, and how many are above 80.',
-  hint:'Count above 80: <code>above = [s for s in scores if s > 80]</code> then <code>print(len(above))</code>. Average: <code>sum(scores) / len(scores)</code>.',
-  check: function(o) { return o.trim().split('\n').filter(function(l){return l.trim();}).length >= 4; }
-},
-
-{ ch:2, title:"Dictionaries", emoji:"📖", concepts:["dict", "{}", "keys", "values", ".items()"],
-  desc:'Dictionaries store <strong>key-value pairs</strong> — like a real dictionary where you look up a word (key) to find its definition (value). Create with <code>{key: value}</code>.',
-  code:'# Create a character sheet\nhero = {\n    "name": "PyKnight",\n    "level": 5,\n    "health": 100,\n    "attack": 15,\n    "weapon": "Code Sword"\n}\n\n# Access values by key\nprint(hero["name"])\nprint(f"Level {hero[\'level\']} — {hero[\'health\']} HP")\n\n# Add and change values\nhero["shield"] = "Bug Shield"     # add new key\nhero["level"] = 6                 # update existing\n\n# Loop through all key-value pairs\nprint("\\n⚔️ CHARACTER SHEET:")\nfor key, value in hero.items():\n    print(f"  {key}: {value}")\n',
-  challenge:'<strong>Mission:</strong> Create a dictionary for your dream pet (or superhero) with at least 6 keys: name, type, age, color, superpower, and catchphrase. Print each detail on its own line.',
-  hint:'<code>pet = {"name": "Sparky", "type": "dragon", "age": 100, ...}</code>. Loop with <code>for k, v in pet.items():</code>.',
-  check: function(o) { return o.trim().split('\n').filter(function(l){return l.trim();}).length >= 6; }
-},
-
-{ ch:2, title:"Nested Loops", emoji:"🌀", concepts:["nested for", "patterns", "grids"],
-  desc:'You can put loops <em>inside</em> loops! The inner loop runs completely for every single step of the outer loop. This is how you make patterns, grids, and tables.',
-  code:'# Multiplication table\nprint("     1    2    3    4    5")\nprint("   +-------------------------")\nfor row in range(1, 6):\n    line = f" {row} |"\n    for col in range(1, 6):\n        product = row * col\n        line += f"  {product:3}"\n    print(line)\n\nprint()\n\n# Draw a box\nfor row in range(5):\n    for col in range(10):\n        if row == 0 or row == 4 or col == 0 or col == 9:\n            print("█", end="")\n        else:\n            print(" ", end="")\n    print()\n',
-  challenge:'<strong>Mission:</strong> Use nested loops to draw an 8×8 checkerboard using <code>⬛</code> and <code>⬜</code> (or <code>#</code> and <code>.</code>) alternating like a chess board.',
-  hint:'<code>for row in range(8):</code> then <code>for col in range(8):</code>. Print one symbol if <code>(row + col) % 2 == 0</code>, else the other. Use <code>end=""</code> and add <code>print()</code> after inner loop.',
-  check: function(o) { return o.trim().split('\n').filter(function(l){return l.trim();}).length >= 8; }
-},
-
-{ ch:2, title:"🎮 Quiz Show", emoji:"❓", project:true, concepts:["list", "dict", "for", "if", "random"],
-  desc:'Build an interactive quiz show! Use a list of dictionaries for questions, a for loop to present them, and if/else to check answers. This ties together everything from the chapter.',
-  code:'import random\n\nquestions = [\n    {\n        "q": "What planet is closest to the Sun?",\n        "options": ["A) Venus", "B) Mercury", "C) Mars"],\n        "answer": "B"\n    },\n    {\n        "q": "How many legs does a spider have?",\n        "options": ["A) 6", "B) 10", "C) 8"],\n        "answer": "C"\n    },\n    {\n        "q": "What language are we learning right now?",\n        "options": ["A) JavaScript", "B) Python", "C) Scratch"],\n        "answer": "B"\n    },\n    {\n        "q": "What does CPU stand for?",\n        "options": ["A) Central Processing Unit", "B) Computer Personal Utility", "C) Cool Program Utility"],\n        "answer": "A"\n    },\n]\n\nscore = 0\ntotal = len(questions)\n\nprint("🧠 PYTHON QUIZ SHOW 🧠")\nprint(f"Answer all {total} questions!\\n")\n\nfor i, q in enumerate(questions, 1):\n    print(f"Question {i}: {q[\'q\']}")\n    for opt in q["options"]:\n        print(f"   {opt}")\n\n    # Simulate a random answer for demo\n    guess = random.choice(["A", "B", "C"])\n    print(f"   Your answer: {guess}")\n\n    if guess == q["answer"]:\n        print("   ✅ Correct!\\n")\n        score += 1\n    else:\n        print(f"   ❌ Nope! The answer was {q[\'answer\']}\\n")\n\nprint(f"Final Score: {score}/{total}")\npercent = int((score / total) * 100)\n\nif percent == 100:\n    print("🏆 PERFECT SCORE! You\'re a genius!")\nelif percent >= 75:\n    print("⭐ Great job!")\nelif percent >= 50:\n    print("👍 Not bad! Keep studying.")\nelse:\n    print("📚 Keep learning — you\'ll get there!")\n',
-  challenge:'<strong>Project:</strong> Add at least 4 more questions about topics YOU know about — sports, games, animals, science, whatever! Bonus: add a difficulty level or category to each question.',
-  hint:'Copy the dictionary format: <code>{"q": "Your question?", "options": ["A) ...", "B) ...", "C) ..."], "answer": "B"}</code>.',
-  check: function(o) { return o.toLowerCase().includes("score"); }
-},
-
-// ─── CHAPTER 3 · FUNCTIONS ──────────────────────────────
-
-{ ch:3, title:"Functions Basics", emoji:"🏗️", concepts:["def", "parameters", "calling"],
-  desc:'Functions are reusable blocks of code — like building your own custom commands. Use <code>def</code> to create one, give it a name, and optionally some <strong>parameters</strong> (inputs).',
-  code:'# Define a simple function\ndef greet(name):\n    print(f"Hey {name}! 🎮 Welcome to Python Quest!")\n\n# Call it with different inputs\ngreet("Alex")\ngreet("Jordan")\ngreet("Python Master")\n\nprint()\n\n# Function with multiple parameters\ndef introduce(name, age, hobby):\n    print(f"Meet {name}, age {age}, who loves {hobby}!")\n\nintroduce("Sam", 12, "coding")\nintroduce("Riley", 10, "soccer")\nintroduce("Morgan", 11, "drawing")\n',
-  challenge:'<strong>Mission:</strong> Write a function called <code>celebrate(name, achievement)</code> that prints a fun celebration message with emoji. Call it at least 3 times with different inputs.',
-  hint:'<code>def celebrate(name, achievement):</code> then inside: <code>print(f"🎉 Huge congrats to {name} for {achievement}!")</code>',
-  check: function(o) { return o.trim().split('\n').filter(function(l){return l.trim();}).length >= 3; }
-},
-
-{ ch:3, title:"Return Values", emoji:"📤", concepts:["return", "using results"],
-  desc:'Functions can send results back with <code>return</code>. This lets you use the answer later — store it in a variable, use it in math, or print it. Without return, a function gives back <code>None</code>.',
-  code:'def add(a, b):\n    return a + b\n\ndef is_even(number):\n    return number % 2 == 0\n\ndef letter_grade(score):\n    if score >= 90: return "A"\n    elif score >= 80: return "B"\n    elif score >= 70: return "C"\n    elif score >= 60: return "D"\n    else: return "F"\n\n# Use the returned values!\nresult = add(15, 27)\nprint(f"15 + 27 = {result}")\n\nprint(f"Is 4 even? {is_even(4)}")\nprint(f"Is 7 even? {is_even(7)}")\n\nmy_grade = letter_grade(88)\nprint(f"Score 88 = Grade {my_grade}")\n\n# You can even chain them:\nprint(f"Grade for {add(40, 52)}: {letter_grade(add(40, 52))}")\n',
-  challenge:'<strong>Mission:</strong> Write <code>is_even(n)</code> that returns True/False, and <code>area_of_triangle(base, height)</code> that returns base × height ÷ 2. Test both with at least 3 different inputs.',
-  hint:'<code>return number % 2 == 0</code> for is_even. <code>return base * height / 2</code> for area. Print the results with f-strings!',
-  check: function(o) { return o.includes("True") && o.includes("False"); }
-},
-
-{ ch:3, title:"Default & Keyword Args", emoji:"⚙️", concepts:["defaults", "keyword arguments"],
-  desc:'Parameters can have <strong>default values</strong> — if you don\'t provide one, it uses the default. You can also use <strong>keyword arguments</strong> to pass values by name, in any order.',
-  code:'def make_sandwich(bread="white", filling="PB&J", toasted=False):\n    status = "🔥 toasted" if toasted else "fresh"\n    print(f"🥪 {status} {bread} sandwich with {filling}")\n\n# Use all defaults\nmake_sandwich()\n\n# Override some\nmake_sandwich("wheat", "turkey")\nmake_sandwich(filling="ham & cheese", toasted=True)\nmake_sandwich("sourdough", "grilled cheese", True)\n\nprint()\n\n# Game example\ndef create_character(name, char_class="Warrior", level=1, weapon="Sword"):\n    print(f"⚔️ {name} the {char_class} (Lv.{level}) — wielding {weapon}")\n\ncreate_character("Luna")\ncreate_character("Zara", "Mage", 5, "Staff")\ncreate_character("Rex", weapon="Battle Axe", level=3)\n',
-  challenge:'<strong>Mission:</strong> Write <code>order_pizza(size="medium", crust="regular", toppings="cheese")</code> that prints a pizza order. Call it 4+ times with different combinations of defaults and custom values.',
-  hint:'Try: <code>order_pizza()</code>, <code>order_pizza("large")</code>, <code>order_pizza(toppings="pepperoni", size="small")</code>.',
-  check: function(o) { return o.trim().split('\n').filter(function(l){return l.trim();}).length >= 4; }
-},
-
-{ ch:3, title:"Randomness & Modules", emoji:"🎰", concepts:["import random", "randint", "choice", "shuffle"],
-  desc:'The <code>random</code> module adds unpredictability to your programs! Use <code>import random</code> to load it. <code>randint(a,b)</code> picks a random integer, <code>choice(list)</code> picks a random item, <code>shuffle(list)</code> scrambles order.',
-  code:'import random\n\n# Roll dice\nprint("🎲 Rolling 5 dice:")\nfor i in range(5):\n    roll = random.randint(1, 6)\n    print(f"  Die {i+1}: {roll}")\n\nprint()\n\n# Random choice\nfoods = ["pizza", "tacos", "sushi", "burgers", "pasta", "ramen"]\nprint(f"🍽️ Tonight we eat: {random.choice(foods)}!")\nprint(f"🍽️ Or maybe: {random.choice(foods)}!")\n\nprint()\n\n# Shuffle\ncards = ["Ace", "King", "Queen", "Jack", "10", "9"]\nprint(f"Before shuffle: {cards}")\nrandom.shuffle(cards)\nprint(f"After shuffle:  {cards}")\n\n# Random float\nprint(f"\\nRandom decimal: {random.random():.4f}")\n',
-  challenge:'<strong>Mission:</strong> Write a <code>roll_dice(num_dice, sides=6)</code> function that rolls multiple dice, prints each roll, and returns the total. Test it with different dice configurations.',
-  hint:'Loop <code>for i in range(num_dice):</code>, roll each with <code>random.randint(1, sides)</code>, keep a running total, and <code>return total</code> at the end.',
-  check: function(o) { return o.trim().split('\n').filter(function(l){return l.trim();}).length >= 4; }
-},
-
-{ ch:3, title:"🎮 Story Generator", emoji:"📚", project:true, concepts:["functions", "random", "lists"],
-  desc:'Build a random story generator that creates a different adventure every time you run it! Combine functions, lists, and randomness for infinite stories.',
-  code:'import random\n\ndef pick(items):\n    return random.choice(items)\n\n# Story building blocks\nheroes = ["a brave knight", "a clever wizard", "a sneaky thief",\n          "a robot from the future", "a talking cat"]\nvillains = ["a fire-breathing dragon", "an evil sorcerer",\n            "a giant spider", "a grumpy troll", "a rogue AI"]\nplaces = ["the Dark Forest", "Crystal Mountain", "the Haunted Castle",\n          "the Underwater Kingdom", "a floating island"]\nweapons = ["a magic wand", "a glowing sword", "a shield of light",\n           "a book of ancient spells", "a laser blaster"]\ntwists = [\n    "But the villain was actually their long-lost sibling!",\n    "Suddenly, the ground started shaking violently!",\n    "A mysterious stranger appeared and offered to help.",\n    "It was all a dream... or WAS it?",\n    "Plot twist: the real treasure was friendship all along."\n]\n\ndef tell_story():\n    print("=" * 44)\n    print("  📖 THE RANDOM ADVENTURE GENERATOR 📖")\n    print("=" * 44)\n    print()\n    print(f"Once upon a time, {pick(heroes)} set out")\n    print(f"on a dangerous journey to {pick(places)}.")\n    print()\n    print(f"Armed with nothing but {pick(weapons)}, our")\n    print(f"hero faced {pick(villains)} in an epic battle!")\n    print()\n    print(f"{pick(twists)}")\n    print()\n    print("And the adventure continues...")\n    print("=" * 44)\n\ntell_story()\n',
-  challenge:'<strong>Project:</strong> Make it epic! Add sidekicks, treasures, plot twists, and endings lists. Create a <code>tell_sequel()</code> function. Add at least 3 more items to each existing list.',
-  hint:'Add <code>sidekicks = ["a loyal dog", "a wise owl", ...]</code>. For the sequel, you could pass the hero as a parameter to connect the two stories.',
-  check: function(o) { return o.includes("====") || o.length > 150; }
-},
-
-// ─── CHAPTER 4 · LEVEL UP ───────────────────────────────
-
-{ ch:4, title:"String Methods", emoji:"🔧", concepts:[".split()", ".join()", ".replace()", ".count()", ".strip()"],
-  desc:'Strings have powerful built-in methods! <code>.split()</code> breaks text into a list of words. <code>.join()</code> combines a list into text. <code>.replace()</code> swaps text. <code>.count()</code> counts occurrences.',
-  code:'sentence = "Python is fun and Python is powerful"\n\n# Split into a list of words\nwords = sentence.split()\nprint(f"Words: {words}")\nprint(f"Word count: {len(words)}")\n\n# Join words back together\nprint(" | ".join(words))\nprint("-".join(["2026", "06", "15"]))\n\n# Replace text\nnew_sentence = sentence.replace("Python", "Coding")\nprint(new_sentence)\n\n# Count and find\nprint(f"Python appears {sentence.count(\"Python\")} times")\nprint(f"First fun at index {sentence.find(\"fun\")}")\n\n# Strip whitespace\nmessy = "   hello world   "\nprint(f"Before strip: [{messy}]")\nprint(f"After strip:  [{messy.strip()}]")\n\n# Chain methods together!\nprint("hello world".title().replace(" ", "_"))\n',
-  challenge:'<strong>Mission:</strong> Write a <code>word_stats(text)</code> function that prints: number of words, number of characters (without spaces), the longest word, and how many times the most common word appears.',
-  hint:'Split for word list. <code>text.replace(" ", "")</code> for chars without spaces. Longest: <code>max(words, key=len)</code>. For most common: use a dictionary to count each word.',
-  check: function(o) { return o.trim().split('\n').filter(function(l){return l.trim();}).length >= 3; }
-},
-
-{ ch:4, title:"List Comprehensions", emoji:"🔪", concepts:["[expr for x in list]", "filtering", "slicing"],
-  desc:'<strong>List comprehensions</strong> are a shortcut to build new lists in one line: <code>[expression for item in sequence]</code>. Add <code>if</code> to filter. Also learn <strong>slicing</strong>: <code>list[start:end]</code> to grab parts.',
-  code:'nums = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]\n\n# Slicing\nprint(f"First 4:   {nums[:4]}")\nprint(f"Last 3:    {nums[-3:]}")\nprint(f"Middle:    {nums[3:7]}")\nprint(f"Every 2nd: {nums[::2]}")\nprint(f"Reversed:  {nums[::-1]}")\n\nprint()\n\n# List comprehensions — build new lists in one line!\nsquares = [x**2 for x in range(1, 8)]\nprint(f"Squares: {squares}")\n\nevens = [x for x in range(20) if x % 2 == 0]\nprint(f"Evens 0-19: {evens}")\n\nwords = ["hello", "world", "python", "quest"]\nshouted = [w.upper() for w in words]\nprint(f"Shouted: {shouted}")\n\nlengths = [len(w) for w in words]\nprint(f"Lengths: {lengths}")\n',
-  challenge:'<strong>Mission:</strong> Use list comprehensions to: (1) find all numbers 1-50 divisible by both 3 AND 5, (2) create a list of squares of odd numbers from 1-20, (3) extract all words longer than 4 letters from a sentence.',
-  hint:'(1) <code>[x for x in range(1,51) if x%3==0 and x%5==0]</code>. (2) <code>[x**2 for x in range(1,21) if x%2!=0]</code>. (3) <code>[w for w in sentence.split() if len(w) > 4]</code>.',
-  check: function(o) { return o.includes("15") && o.includes("45"); }
-},
-
-{ ch:4, title:"Error Handling", emoji:"🛡️", concepts:["try", "except", "handling errors"],
-  desc:'Errors happen! Instead of your program crashing, you can <strong>catch</strong> errors with <code>try/except</code> and handle them gracefully. This makes your programs much more robust.',
-  code:'# Without try/except, this would crash:\n# print(10 / 0)   # ZeroDivisionError!\n\n# With try/except, we handle it gracefully:\ntry:\n    result = 10 / 0\n    print(result)\nexcept ZeroDivisionError:\n    print("⚠️ Oops! Cannot divide by zero!")\n\nprint()  # program keeps running!\n\n# Handle different types of errors\ndef safe_divide(a, b):\n    try:\n        result = a / b\n        return f"{a} ÷ {b} = {result:.2f}"\n    except ZeroDivisionError:\n        return "⚠️ Cannot divide by zero!"\n    except TypeError:\n        return "⚠️ Please use numbers only!"\n\nprint(safe_divide(10, 3))\nprint(safe_divide(10, 0))\nprint(safe_divide("hello", 5))\n\n# Index errors\nnums = [10, 20, 30]\ntry:\n    print(nums[99])\nexcept IndexError:\n    print("⚠️ That index does not exist!")\n',
-  challenge:'<strong>Mission:</strong> Write a <code>safe_calculator(a, operator, b)</code> function that handles +, -, *, / operations. Use try/except to handle division by zero, invalid operators, and any other errors.',
-  hint:'Use if/elif for operators: <code>if op == "+": return a + b</code>. Wrap the division in try/except. Add <code>else: return "Unknown operator"</code>.',
-  check: function(o) { return o.trim().split('\n').filter(function(l){return l.trim();}).length >= 3; }
-},
-
-{ ch:4, title:"Sets & Tuples", emoji:"🎭", concepts:["set{}", "tuple()", "unique", "&", "|"],
-  desc:'<strong>Tuples</strong> <code>()</code> are unchangeable lists — useful for coordinates and fixed data. <strong>Sets</strong> <code>{}</code> hold unique items only — great for removing duplicates and comparing groups.',
-  code:'# Tuples — unchangeable\ncoordinates = (10, 20)\nrgb_color = (255, 128, 0)\nprint(f"Position: {coordinates}")\nprint(f"Color: {rgb_color}")\n\n# Tuple unpacking — super useful!\nx, y = coordinates\nprint(f"x = {x}, y = {y}")\n\nprint()\n\n# Sets — unique items only, no duplicates!\nnumbers = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3}\nprint(f"Unique numbers: {numbers}")\n\n# Remove duplicates from a list\nnames = ["Alex", "Sam", "Alex", "Jordan", "Sam", "Alex"]\nunique_names = set(names)\nprint(f"Unique names: {unique_names}")\n\n# Set operations — compare groups!\nmy_games = {"Minecraft", "Zelda", "Fortnite", "Roblox"}\nfriend_games = {"Minecraft", "Among Us", "Fortnite", "Rocket League"}\n\nprint(f"\\nBoth play:      {my_games & friend_games}")\nprint(f"All games:      {my_games | friend_games}")\nprint(f"Only I play:    {my_games - friend_games}")\nprint(f"Only they play: {friend_games - my_games}")\n',
-  challenge:'<strong>Mission:</strong> Create two sets of your favorite foods and a friend\'s favorites. Find what you share, what\'s unique to each, and the combined list. Also use a set to find unique letters in your name.',
-  hint:'<code>my_foods = {"pizza", "tacos", "sushi"}</code>. Use <code>&</code> for shared, <code>-</code> for unique, <code>|</code> for all. Unique letters: <code>set("yourname")</code>.',
-  check: function(o) { return o.trim().split('\n').filter(function(l){return l.trim();}).length >= 3; }
-},
-
-{ ch:4, title:"🎮 Data Cruncher", emoji:"📊", project:true, concepts:["functions", "lists", "dicts", "string methods"],
-  desc:'Build a data analysis tool! Given numbers or text, compute statistics, find patterns, and display results in a formatted report. This is what real data scientists do!',
-  code:'def analyze_numbers(numbers, label="Dataset"):\n    n = len(numbers)\n    avg = sum(numbers) / n\n    sorted_nums = sorted(numbers)\n    median = sorted_nums[n // 2]\n    above_avg = len([x for x in numbers if x > avg])\n\n    print(f"📊 {label.upper()} ANALYSIS")\n    print(f"  Count:     {n}")\n    print(f"  Sum:       {sum(numbers)}")\n    print(f"  Average:   {avg:.1f}")\n    print(f"  Median:    {median}")\n    print(f"  Min:       {min(numbers)}")\n    print(f"  Max:       {max(numbers)}")\n    print(f"  Range:     {max(numbers) - min(numbers)}")\n    print(f"  Above avg: {above_avg} values")\n    print()\n\ndef analyze_text(text):\n    words = text.split()\n    unique = set(w.lower().strip(".,!?;:") for w in words)\n    longest = max(words, key=len)\n\n    # Count word frequency\n    freq = {}\n    for w in words:\n        clean = w.lower().strip(".,!?;:")\n        freq[clean] = freq.get(clean, 0) + 1\n    top_word = max(freq, key=freq.get)\n\n    print("📝 TEXT ANALYSIS")\n    print(f"  Words:        {len(words)}")\n    print(f"  Unique words: {len(unique)}")\n    print(f"  Characters:   {len(text.replace(chr(32), chr(0)))}")\n    print(f"  Longest word: \\\"{longest}\\\" ({len(longest)} chars)")\n    print(f"  Most common:  \\\"{top_word}\\\" ({freq[top_word]}x)")\n    print()\n\n# Test with sample data\ntest_scores = [72, 85, 91, 68, 95, 88, 76, 93, 82, 79]\nanalyze_numbers(test_scores, "Test Scores")\n\nsample_text = "Python is great. Python lets you build amazing things. Keep coding with Python and keep creating awesome projects!"\nanalyze_text(sample_text)\n',
-  challenge:'<strong>Project:</strong> Expand the analyzer! Add: a letter frequency counter, a function to find the mode (most common number), a bar chart made of text characters, or analysis of your own custom dataset.',
-  hint:'Letter frequency: loop through <code>text.lower()</code> and count each letter with a dict. Bar chart: <code>print("█" * count)</code> for each item.',
-  check: function(o) { return o.toLowerCase().includes("analysis"); }
-},
-
-// ─── CHAPTER 5 · BOSS LEVEL ─────────────────────────────
-
-{ ch:5, title:"Classes & Objects", emoji:"🎓", concepts:["class", "__init__", "self", "methods"],
-  desc:'Classes are <strong>blueprints</strong> for creating objects — things that have their own data (attributes) and actions (methods). <code>__init__</code> sets up the object. <code>self</code> refers to the specific instance.',
-  code:'class Pet:\n    def __init__(self, name, species, age):\n        self.name = name\n        self.species = species\n        self.age = age\n        self.hunger = 50      # starts half hungry\n        self.happiness = 50\n\n    def feed(self):\n        self.hunger = max(0, self.hunger - 25)\n        self.happiness = min(100, self.happiness + 10)\n        print(f"🍖 Fed {self.name}! Hunger: {self.hunger} | Happy: {self.happiness}")\n\n    def play(self):\n        self.hunger = min(100, self.hunger + 15)\n        self.happiness = min(100, self.happiness + 20)\n        print(f"🎾 Played with {self.name}! Hunger: {self.hunger} | Happy: {self.happiness}")\n\n    def status(self):\n        print(f"🐾 {self.name} the {self.species} (age {self.age})")\n        print(f"   Hunger: {self.hunger}/100 | Happiness: {self.happiness}/100")\n\n# Create pet objects from the blueprint\ndog = Pet("Buddy", "Golden Retriever", 3)\ncat = Pet("Whiskers", "Tabby Cat", 7)\n\ndog.status()\ndog.feed()\ndog.play()\nprint()\ncat.status()\ncat.feed()\n',
-  challenge:'<strong>Mission:</strong> Create a <code>Student</code> class with name, grade, and a list of subjects. Add methods: <code>add_subject(name)</code>, <code>drop_subject(name)</code>, and <code>report_card()</code>. Create 2 students and test everything.',
-  hint:'In <code>__init__</code>: <code>self.subjects = []</code>. In <code>add_subject</code>: <code>self.subjects.append(name)</code>. In <code>report_card</code>: loop through and print each subject.',
-  check: function(o) { return o.trim().split('\n').filter(function(l){return l.trim();}).length >= 6; }
-},
-
-{ ch:5, title:"Class Interactions", emoji:"⚔️", concepts:["__str__", "object interaction", "encapsulation"],
-  desc:'Classes get powerful when objects interact! <code>__str__</code> controls what <code>print(myobject)</code> shows. Methods can take other objects as parameters, enabling rich interactions.',
-  code:'class BankAccount:\n    def __init__(self, owner, balance=0):\n        self.owner = owner\n        self.balance = balance\n        self.history = []\n\n    def __str__(self):\n        return f"💰 {self.owner} Account: ${self.balance:.2f}"\n\n    def deposit(self, amount):\n        self.balance += amount\n        self.history.append(f"Deposited ${amount:.2f}")\n        print(f"  ✅ Deposited ${amount:.2f}")\n\n    def withdraw(self, amount):\n        if amount > self.balance:\n            print(f"  ❌ Insufficient funds! (Balance: ${self.balance:.2f})")\n            return False\n        self.balance -= amount\n        self.history.append(f"Withdrew ${amount:.2f}")\n        print(f"  ✅ Withdrew ${amount:.2f}")\n        return True\n\n    def transfer(self, other, amount):\n        print(f"  📤 Transfer ${amount:.2f}: {self.owner} → {other.owner}")\n        if self.withdraw(amount):\n            other.deposit(amount)\n            return True\n        return False\n\n# Test it out\nalice = BankAccount("Alice", 500)\nbob = BankAccount("Bob", 200)\n\nprint(alice)\nprint(bob)\nprint()\nalice.deposit(100)\nalice.transfer(bob, 250)\nprint()\nprint(alice)\nprint(bob)\n',
-  challenge:'<strong>Mission:</strong> Add a <code>show_history()</code> method. Then add a <code>VIPAccount</code> idea: if balance > $1000, deposits get a 5% bonus. Test transfers between accounts.',
-  hint:'In <code>show_history</code>: loop through <code>self.history</code> and print each entry. For VIP bonus: <code>if self.balance > 1000: amount *= 1.05</code> inside deposit.',
-  check: function(o) { return o.trim().split('\n').filter(function(l){return l.trim();}).length >= 6; }
-},
-
-{ ch:5, title:"Lists of Objects", emoji:"🗂️", concepts:["objects in lists", "sorting", "filtering", "lambda"],
-  desc:'The real magic happens when you combine classes with lists! Create collections of objects, then search, filter, sort, and analyze them — just like a real database.',
-  code:'class Game:\n    def __init__(self, title, genre, rating, hours_played):\n        self.title = title\n        self.genre = genre\n        self.rating = rating\n        self.hours = hours_played\n\n    def __str__(self):\n        stars = "⭐" * round(self.rating)\n        return f"{stars} {self.title} ({self.genre}) — {self.hours}hrs"\n\n# Build a game library\nlibrary = [\n    Game("Minecraft", "Sandbox", 5, 500),\n    Game("Fortnite", "Battle Royale", 4, 200),\n    Game("Zelda TOTK", "Adventure", 5, 150),\n    Game("Rocket League", "Sports", 4, 300),\n    Game("Stardew Valley", "Simulation", 5, 180),\n    Game("Among Us", "Party", 3, 50),\n    Game("Mario Kart 8", "Racing", 5, 120),\n]\n\n# Print all games\nprint("🎮 MY GAME LIBRARY")\nprint("-" * 50)\nfor game in library:\n    print(f"  {game}")\n\n# Filter: 5-star games only\nprint("\\n🏆 5-STAR GAMES:")\ntop_games = [g for g in library if g.rating == 5]\nfor g in top_games:\n    print(f"  {g.title}")\n\n# Sort by hours played\nprint("\\n⏰ MOST PLAYED:")\nby_hours = sorted(library, key=lambda g: g.hours, reverse=True)\nfor g in by_hours[:3]:\n    print(f"  {g.hours}hrs — {g.title}")\n\n# Total hours\ntotal = sum(g.hours for g in library)\nprint(f"\\n📊 Total gaming hours: {total}")\n',
-  challenge:'<strong>Mission:</strong> Create a <code>Song</code> class (title, artist, duration_seconds). Build a playlist of 6+ songs. Print total duration as min:sec, find the longest song, and show all songs by one artist.',
-  hint:'Total seconds: <code>sum(s.duration_seconds for s in playlist)</code>. Convert: <code>mins = total // 60</code>, <code>secs = total % 60</code>. Longest: <code>max(playlist, key=lambda s: s.duration_seconds)</code>.',
-  check: function(o) { return o.trim().split('\n').filter(function(l){return l.trim();}).length >= 6; }
-},
-
-{ ch:5, title:"Bringing It Together", emoji:"🧩", concepts:["design", "combining concepts"],
-  desc:'You now know variables, strings, math, decisions, loops, lists, dicts, functions, classes, error handling, and more — everything to build real programs! Let\'s combine them in a complex program.',
-  code:'import random\n\nclass Player:\n    def __init__(self, name):\n        self.name = name\n        self.score = 0\n        self.streak = 0\n        self.best_streak = 0\n\n    def got_correct(self, points):\n        self.score += points\n        self.streak += 1\n        self.best_streak = max(self.best_streak, self.streak)\n        if self.streak >= 3:\n            bonus = self.streak * 2\n            self.score += bonus\n            print(f"  🔥 {self.streak}-STREAK! +{bonus} bonus!")\n\n    def got_wrong(self):\n        self.streak = 0\n\n    def summary(self):\n        print(f"\\n🏁 {self.name} - Results:")\n        print(f"  Score: {self.score} points")\n        print(f"  Best streak: {self.best_streak}")\n        if self.score >= 80:\n            print("  Rating: 🌟 LEGENDARY")\n        elif self.score >= 50:\n            print("  Rating: ⭐ Great!")\n        else:\n            print("  Rating: 👍 Keep practicing!")\n\ndef math_challenge(player, rounds=8):\n    ops = {\n        "+": lambda a, b: a + b,\n        "-": lambda a, b: a - b,\n        "x": lambda a, b: a * b,\n    }\n\n    print(f"\\n🧮 MATH BLITZ — {rounds} rounds!")\n    print(f"  Player: {player.name}\\n")\n\n    for r in range(1, rounds + 1):\n        a = random.randint(2, 15)\n        b = random.randint(2, 12)\n        op = random.choice(list(ops.keys()))\n        correct = ops[op](a, b)\n\n        # Simulate answer (70% chance correct)\n        if random.random() < 0.7:\n            answer = correct\n        else:\n            answer = correct + random.randint(-5, 5)\n\n        print(f"  Q{r}: {a} {op} {b} = ? → {answer}", end="")\n\n        if answer == correct:\n            player.got_correct(10)\n            print(f"  ✅ (+10 = {player.score}pts)")\n        else:\n            player.got_wrong()\n            print(f"  ❌ was {correct} ({player.score}pts)")\n\n    player.summary()\n\n# Play!\np = Player("Coder")\nmath_challenge(p)\n',
-  challenge:'<strong>Mission:</strong> Add division problems (handle remainders!), add difficulty modes that change number ranges, or create a two-player mode that alternates turns and declares a winner.',
-  hint:'For difficulty: create easy/medium/hard number ranges. Two-player: create two Player objects, alternate questions, compare scores at the end.',
-  check: function(o) { return o.includes("Results") || o.includes("BLITZ"); }
-},
-
-{ ch:5, title:"🎮 RPG Battle!", emoji:"⚔️", project:true, concepts:["classes", "random", "loops", "everything!"],
-  desc:'Your FINAL boss project: a turn-based RPG battle system! This epic program combines every single concept you\'ve learned. Study it, run it, then make it your own masterpiece.',
-  code:'import random\n\nclass Fighter:\n    def __init__(self, name, hp, attack, defense, emoji):\n        self.name = name\n        self.max_hp = hp\n        self.hp = hp\n        self.attack = attack\n        self.defense = defense\n        self.emoji = emoji\n        self.potions = 2\n\n    def is_alive(self):\n        return self.hp > 0\n\n    def hp_bar(self):\n        bars = int((self.hp / self.max_hp) * 20)\n        return f"[{chr(9608) * bars}{chr(9617) * (20 - bars)}] {self.hp}/{self.max_hp}"\n\n    def do_attack(self, target):\n        roll = random.randint(1, 20)\n        if roll == 20:\n            dmg = self.attack * 2\n            actual = max(1, dmg - target.defense // 3)\n            target.hp = max(0, target.hp - actual)\n            print(f"  {chr(128165)} CRITICAL HIT! {self.name} deals {actual} damage!")\n        elif roll <= 2:\n            print(f"  {chr(128168)} {self.name} missed!")\n        else:\n            base_dmg = random.randint(self.attack // 2, self.attack)\n            actual = max(1, base_dmg - target.defense // 3)\n            target.hp = max(0, target.hp - actual)\n            print(f"  {chr(9876)}{chr(65039)} {self.name} attacks for {actual} damage!")\n\n    def use_potion(self):\n        if self.potions > 0:\n            heal = random.randint(20, 35)\n            self.hp = min(self.max_hp, self.hp + heal)\n            self.potions -= 1\n            print(f"  {chr(129514)} {self.name} heals +{heal} HP! ({self.potions} potions left)")\n        else:\n            print(f"  {chr(10060)} {self.name} has no potions!")\n            self.do_attack(self)\n\ndef battle(hero, boss):\n    print()\n    print("=" * 46)\n    print(f"  {hero.emoji} {hero.name}  VS  {boss.emoji} {boss.name}")\n    print("=" * 46)\n    print()\n\n    turn = 1\n    while hero.is_alive() and boss.is_alive():\n        print(f"--- Turn {turn} ---")\n        print(f"  {hero.emoji} {hero.name}: {hero.hp_bar()}")\n        print(f"  {boss.emoji} {boss.name}: {boss.hp_bar()}")\n\n        # Hero AI\n        if hero.hp < hero.max_hp * 0.3 and hero.potions > 0:\n            hero.use_potion()\n        else:\n            hero.do_attack(boss)\n\n        if not boss.is_alive():\n            break\n\n        # Boss AI\n        if boss.hp < boss.max_hp * 0.25 and boss.potions > 0:\n            boss.use_potion()\n        else:\n            boss.do_attack(hero)\n\n        turn += 1\n        print()\n\n    print()\n    print("=" * 46)\n    if hero.is_alive():\n        print(f"  {chr(127942)} {hero.name} WINS with {hero.hp} HP remaining!")\n    else:\n        print(f"  {chr(128128)} {boss.name} wins... {hero.name} has fallen.")\n    print("=" * 46)\n\n# ═══ CREATE FIGHTERS AND BATTLE! ═══\nhero = Fighter("PyKnight", 100, 22, 8, chr(128481))\nboss = Fighter("BugDragon", 120, 18, 5, chr(128009))\nbattle(hero, boss)\n',
-  challenge:'<strong>FINAL PROJECT:</strong> Make it EPIC! Add special moves with cooldowns, fight a gauntlet of 3 monsters in a row, add XP and leveling up after each win, create different character classes (Warrior/Mage/Rogue), or build a 2v2 team battle system!',
-  hint:'Special moves: add <code>self.special_cooldown = 0</code> and decrement each turn. Gauntlet: put battle() in a loop with a list of monsters. Leveling: <code>hero.attack += 3</code> after each win.',
-  check: function(o) { return o.includes("====") || o.includes("VS") || o.length > 300; }
-},
-
+var LESSONS=[
+{ch:0,title:"Say Hello!",emoji:"\ud83d\udc4b",concepts:["print()"],desc:"Every coder's first program! The <code>print()</code> command tells Python to display text on screen. Put your message inside quote marks and parentheses.",code:"# Your first Python program!\n# Click the green \u25b6 Run button to see it work\n\nprint(\"Hello, World!\")\nprint(\"Python is awesome!\")\nprint(\"I am learning to code!\")\n",challenge:"<strong>Mission:</strong> Change all three messages to say something about YOU \u2014 your name, your favorite thing, and what you want to build.",hint:"Replace the text inside the quotes with your own words. Keep the quote marks! Example: <code>print(\"Hi, I'm Alex!\")</code>",check:function(o){var t=o.trim().toLowerCase();return t!=="hello, world!\npython is awesome!\ni am learning to code!"&&t.length>10;},project:false},
+{ch:0,title:"Drawing with Code!",emoji:"\ud83c\udfa8",concepts:["canvas", "rect()", "circle()", "clear()"],desc:"Let's draw pictures with Python! Use <code>clear()</code> to set a background, <code>rect()</code> for rectangles, <code>circle()</code> for circles, and <code>text()</code> to write words on the canvas.",code:"# \ud83c\udfa8 Drawing with Python!\n# These commands draw on the canvas to the right \u2192\n\nclear(\"navy\")\n\n# Draw rectangles: rect(x, y, width, height, color)\nrect(50, 50, 120, 80, \"crimson\")\nrect(200, 100, 60, 150, \"gold\")\n\n# Draw circles: circle(x, y, radius, color)\ncircle(300, 80, 50, \"lime\")\ncircle(150, 200, 30, \"hotpink\")\n\n# Write text: text(x, y, message, color, size)\ntext(100, 280, \"Hello from Python!\", \"white\", 20)\n",challenge:"<strong>Mission:</strong> Create your own picture! Draw a simple house (rect for walls, a triangle-ish roof with rects, circle for sun, text for a sign). Use at least 5 drawing commands.",hint:"Try: <code>clear(\"skyblue\")</code> then <code>rect(100, 150, 200, 120, \"brown\")</code> for walls, <code>rect(170, 200, 60, 70, \"yellow\")</code> for a door, <code>circle(350, 50, 40, \"gold\")</code> for sun.",check:function(o){return o.indexOf("[canvas]")!==-1;},project:false},
+{ch:0,title:"Variables",emoji:"\ud83d\udce6",concepts:["variables", "=", "int", "str", "float"],desc:"Variables are like labeled boxes where you store information. Pick a name, use <code>=</code> to put a value in. Python has <strong>strings</strong> (text in quotes), <strong>integers</strong> (whole numbers), and <strong>floats</strong> (decimals).",code:"# Create some variables\nname = \"Python\"\nversion = 3\npi = 3.14159\n\n# Print them\nprint(name)\nprint(version)\nprint(pi)\n\n# Check what type each variable is\nprint(type(name))      # str (string = text)\nprint(type(version))   # int (integer = whole number)\nprint(type(pi))        # float (decimal number)\n\n# Variables can change!\nname = \"Python Quest\"\nprint(name)\n",challenge:"<strong>Mission:</strong> Create variables for <code>my_name</code> (text), <code>my_age</code> (number), and <code>favorite_food</code> (text). Print all three and their types.",hint:"Text needs quotes: <code>my_name = \"Alex\"</code>. Numbers don't: <code>my_age = 12</code>. Check type with <code>print(type(my_name))</code>.",check:function(o){return o.trim().split("\n").filter(function(l){return l.trim();}).length>=4;},project:false},
+{ch:0,title:"Math & Strings",emoji:"\ud83d\udd22",concepts:["+", "-", "*", "/", "**", "f-string", "len()"],desc:"Python is a super-calculator! Use <code>+</code> add, <code>-</code> subtract, <code>*</code> multiply, <code>/</code> divide, <code>**</code> power. <strong>f-strings</strong> let you mix variables into text: <code>f\"Hi {name}\"</code>.",code:"# Math operators\nprint(6 * 7)         # 42\nprint(2 ** 10)       # 1024 (2 to the power of 10)\nprint(17 % 5)        # 2 (remainder)\nprint((2 + 3) * 4)   # 20\n\n# f-strings \u2014 mix variables into text\nname = \"Coder\"\nage = 12\nprint(f\"Hi, I'm {name} and I'm {age} years old!\")\nprint(f\"Next year I'll be {age + 1}!\")\n\n# String tricks\nprint(\"ha\" * 5)              # hahahahaha\nprint(\"HELLO\".lower())       # hello\nprint(len(\"Python Quest\"))   # 12 characters\n",challenge:"<strong>Mission:</strong> Calculate seconds in a day (24 x 60 x 60) and seconds in a year. Print both with f-strings. Then draw those numbers on the canvas!",hint:"<code>day_secs = 24 * 60 * 60</code>. To draw on canvas: <code>clear(\"black\")</code> then <code>text(50, 150, f\"Seconds in a day: {day_secs}\", \"cyan\", 18)</code>",check:function(o){return o.indexOf("86400")!==-1;},project:false},
+{ch:0,title:"\ud83c\udfae Mad Libs!",emoji:"\ud83c\udfad",concepts:["variables", "print()", "f-strings"],desc:"Time for your first project! Mad Libs is a word game where you fill in blanks to create a hilarious story. This version asks you to type words using <code>input()</code>!",code:"# \u2550\u2550\u2550 INTERACTIVE MAD LIBS! \u2550\u2550\u2550\n# The program will ask you for words, then build a story!\n\nprint(\"=== MAD LIBS: THE SILLIEST STORY ===\")\nprint(\"Answer each question to build your story!\\n\")\n\nanimal = input(\"Type an animal: \")\ncolor = input(\"Type a color: \")\nfood = input(\"Type a food: \")\nnumber = input(\"Type a number: \")\nplace = input(\"Type a place: \")\nverb = input(\"Type an action (like dancing): \")\n\nprint()\nprint(\"\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\")\nprint(\"\u2551     YOUR SILLY STORY            \u2551\")\nprint(\"\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d\")\nprint()\nprint(f\"Once upon a time, a {color} {animal}\")\nprint(f\"traveled to {place} to find\")\nprint(f\"{number} pieces of magical {food}.\")\nprint()\nprint(f\"When it arrived, everyone was {verb}!\")\nprint(f\"The {animal} joined in, and they all\")\nprint(f\"ate {food} until the {color} sun set.\")\nprint()\nprint(\"THE END!\")\n",challenge:"<strong>Project:</strong> Add at least 3 more <code>input()</code> questions (adjective, superpower, friend name) and weave them into a longer, funnier story!",hint:"Add more inputs like <code>adj = input(\"Type an adjective: \")</code> then use them in f-strings.",check:function(o){return o.split("\n").filter(function(l){return l.trim();}).length>=8;},project:true},
+{ch:1,title:"If / Else",emoji:"\ud83e\udd14",concepts:["if", "elif", "else", "==", ">", "<"],desc:"Programs can make decisions! Use <code>if</code> to check a condition, <code>elif</code> for more checks, <code>else</code> as a fallback. Code inside must be <strong>indented</strong> with 4 spaces.",code:"temperature = 85\n\nif temperature > 90:\n    print(\"Super hot! Stay hydrated!\")\nelif temperature > 70:\n    print(\"Nice and warm outside!\")\nelif temperature > 50:\n    print(\"Grab a jacket!\")\nelse:\n    print(\"Freezing!\")\n\nprint(f\"The temperature is {temperature} F\")\n",challenge:"<strong>Mission:</strong> Create a <code>score</code> variable (0-100). Print \"A\" for 90+, \"B\" for 80+, \"C\" for 70+, \"D\" for 60+, and \"F\" below 60.",hint:"<code>score = 85</code>, then <code>if score >= 90:</code> with indented <code>print(\"A\")</code>, then <code>elif score >= 80:</code> etc.",check:function(o){var u=o.trim().toUpperCase();return"ABCDF".split("").some(function(g){return u.indexOf(g)!==-1;});},project:false},
+{ch:1,title:"Logic Operators",emoji:"\ud83e\udde0",concepts:["and", "or", "not", "True", "False"],desc:"Combine conditions with <code>and</code> (both must be true), <code>or</code> (at least one true), and <code>not</code> (flips true to false).",code:"age = 12\nheight = 52\n\n# AND - both must be true\nif age >= 10 and height >= 48:\n    print(\"You can ride the roller coaster!\")\nelse:\n    print(\"Sorry, not yet!\")\n\n# OR - at least one must be true\nday = \"Saturday\"\nif day == \"Saturday\" or day == \"Sunday\":\n    print(\"It's the weekend!\")\n\n# NOT - flips the result\nraining = False\nif not raining:\n    print(\"Let's go outside!\")\n",challenge:"<strong>Mission:</strong> Create <code>has_ticket</code> (True/False) and <code>age</code>. You can enter the movie if you have a ticket AND are 13+, OR if you are a VIP.",hint:"<code>if (has_ticket and age >= 13) or is_vip:</code>",check:function(o){return o.trim().length>5;},project:false},
+{ch:1,title:"Loop Art!",emoji:"\ud83d\udd01",concepts:["for", "range()", "canvas", "loops"],desc:"Loops repeat code automatically! <code>for i in range(5):</code> runs code 5 times with i going 0,1,2,3,4. Combined with drawing, loops can create amazing patterns!",code:"# Loops + Drawing = Art!\nclear(\"black\")\n\n# Draw a row of circles\nfor i in range(10):\n    x = 20 + i * 38\n    circle(x, 30, 15, \"cyan\")\n\n# Draw a colorful gradient of rectangles\ncolors = [\"red\", \"orange\", \"gold\", \"green\", \"cyan\", \"blue\", \"purple\"]\nfor i, color in enumerate(colors):\n    rect(10, 70 + i * 30, 380, 25, color)\n\n# Draw a diagonal pattern\nfor i in range(15):\n    x = i * 27\n    y = i * 20\n    circle(x, y, 10, \"white\")\n\n# Print loop counts too\nfor n in range(1, 6):\n    print(f\"{n} x 7 = {n * 7}\")\n",challenge:"<strong>Mission:</strong> Use a for loop to draw a <strong>bullseye target</strong> \u2014 circles of decreasing size centered on the canvas. Use at least 5 circles with alternating colors (red, white, red, white, red).",hint:"Start big and go small: <code>for i in range(5):</code> then <code>circle(200, 150, 120 - i*25, color)</code>. Alternate colors with <code>if i % 2 == 0: color = \"red\"</code>.",check:function(o){return o.indexOf("[canvas]")!==-1;},project:false},
+{ch:1,title:"While Loops",emoji:"\u23f3",concepts:["while", "break", "+=", "-="],desc:"A <code>while</code> loop repeats as long as a condition is True. Great for countdowns and accumulating totals! Use <code>break</code> to exit early.",code:"# Countdown!\ncountdown = 5\nwhile countdown > 0:\n    print(f\"{countdown}...\")\n    countdown -= 1\nprint(\"Liftoff!\")\n\nprint(\"---\")\n\n# Adding up numbers\ntotal = 0\nn = 1\nwhile n <= 10:\n    total += n\n    n += 1\nprint(f\"Sum of 1-10 = {total}\")\n",challenge:"<strong>Mission:</strong> Start with <code>power = 1</code>. Double it in a while loop, printing each value. Stop at the first power of 2 over 1000.",hint:"<code>power = 1</code>, then <code>while power <= 1000:</code> with <code>print(power)</code> and <code>power *= 2</code> inside.",check:function(o){return o.indexOf("1024")!==-1;},project:false},
+{ch:1,title:"\ud83c\udfae Guessing Game",emoji:"\ud83c\udfb2",concepts:["input()", "if", "while", "random"],desc:"Build a REAL guessing game that YOU can play! Use <code>input()</code> to type your guesses, if/else to check them, and a while loop to keep playing.",code:"import random\n\nprint(\"=== NUMBER GUESSING GAME ===\")\nprint(\"I picked a number between 1 and 20.\")\nprint(\"You have 5 tries. Good luck!\\n\")\n\nsecret = random.randint(1, 20)\nattempts = 0\nwon = False\n\nwhile attempts < 5:\n    guess_text = input(f\"Guess #{attempts+1}: Pick a number (1-20): \")\n    try:\n        guess = int(guess_text)\n    except:\n        print(\"  Please type a number!\")\n        continue\n    \n    attempts += 1\n\n    if guess == secret:\n        print(f\"\\nYES! The number was {secret}!\")\n        print(f\"You got it in {attempts} tries!\")\n        won = True\n        break\n    elif guess < secret:\n        print(\"  Too low! Go higher.\")\n    else:\n        print(\"  Too high! Go lower.\")\n\nif not won:\n    print(f\"\\nOut of tries! The number was {secret}.\")\n",challenge:"<strong>Project:</strong> Make it better! Change range to 1-100, add more tries, add a scoring system, or show a different message based on how many tries it took.",hint:"For scoring: <code>if attempts <= 2: print(\"LEGENDARY!\")</code>. For bigger range, change <code>randint(1, 20)</code> to <code>randint(1, 100)</code>.",check:function(o){return o.length>50;},project:true},
+{ch:2,title:"Lists",emoji:"\ud83d\udccb",concepts:["list", "[]", "append()", "len()", "indexing"],desc:"Lists store multiple items in one variable. Items numbered starting at <strong>0</strong>. Use <code>.append()</code> to add items and <code>len()</code> to count them.",code:"fruits = [\"apple\", \"banana\", \"cherry\", \"mango\"]\n\nprint(fruits)        # whole list\nprint(fruits[0])     # first: apple\nprint(fruits[-1])    # last: mango\nprint(len(fruits))   # count: 4\n\n# Add an item\nfruits.append(\"grape\")\nprint(f\"After append: {fruits}\")\n\n# Loop through\nfor fruit in fruits:\n    print(f\"  I like {fruit}!\")\n",challenge:"<strong>Mission:</strong> Create a list of 5+ favorites. Print the count, add one with <code>.append()</code>, then number them with <code>enumerate</code>.",hint:"<code>for i, item in enumerate(faves, 1):</code> then <code>print(f\"{i}. {item}\")</code>",check:function(o){return o.trim().split("\n").filter(function(l){return l.trim();}).length>=6;},project:false},
+{ch:2,title:"List Superpowers",emoji:"\ud83d\udee0\ufe0f",concepts:[".sort()", ".reverse()", "max()", "min()", "sum()"],desc:"Lists have built-in methods: <code>.sort()</code>, <code>.reverse()</code>, <code>.pop()</code>. Use <code>max()</code>, <code>min()</code>, and <code>sum()</code> for number lists.",code:"scores = [85, 92, 78, 95, 88, 73, 91]\nprint(f\"Original: {scores}\")\n\nscores.sort()\nprint(f\"Sorted:   {scores}\")\n\nscores.reverse()\nprint(f\"Reversed: {scores}\")\n\nlast = scores.pop()\nprint(f\"Popped {last}: {scores}\")\n\nprint(f\"Highest: {max(scores)}\")\nprint(f\"Lowest:  {min(scores)}\")\nprint(f\"Average: {sum(scores) / len(scores):.1f}\")\n",challenge:"<strong>Mission:</strong> Create 8 test scores. Sort them, print min/max, the average, and how many are above 80.",hint:"Count above 80: <code>above = [s for s in scores if s > 80]</code> then <code>print(len(above))</code>.",check:function(o){return o.trim().split("\n").filter(function(l){return l.trim();}).length>=4;},project:false},
+{ch:2,title:"Dictionaries",emoji:"\ud83d\udcd6",concepts:["dict", "{}", "keys", "values", ".items()"],desc:"Dictionaries store <strong>key-value pairs</strong>. Create with <code>{key: value}</code>. Look up values by key, add new ones, and loop through them.",code:"hero = {\n    \"name\": \"PyKnight\",\n    \"level\": 5,\n    \"health\": 100,\n    \"weapon\": \"Code Sword\"\n}\n\nprint(hero[\"name\"])\nprint(f\"Level {hero['level']} with {hero['health']} HP\")\n\n# Add and change values\nhero[\"shield\"] = \"Bug Shield\"\nhero[\"level\"] = 6\n\n# Loop through all pairs\nprint(\"\\nCHARACTER SHEET:\")\nfor key, value in hero.items():\n    print(f\"  {key}: {value}\")\n",challenge:"<strong>Mission:</strong> Create a dictionary for a dream pet with 6+ keys (name, type, age, color, superpower, catchphrase). Print each detail.",hint:"<code>pet = {\"name\": \"Sparky\", \"type\": \"dragon\", ...}</code>. Loop with <code>for k, v in pet.items():</code>",check:function(o){return o.trim().split("\n").filter(function(l){return l.trim();}).length>=6;},project:false},
+{ch:2,title:"Pixel Art!",emoji:"\ud83c\udf00",concepts:["nested for", "canvas", "grid", "patterns"],desc:"Nested loops (loops inside loops) let you fill grids! Combined with drawing, you can create pixel art. The inner loop runs completely for each step of the outer loop.",code:"# === PIXEL ART WITH NESTED LOOPS ===\nclear(\"black\")\nsize = 10  # pixel size\n\n# Draw a checkerboard\nfor row in range(30):\n    for col in range(40):\n        if (row + col) % 2 == 0:\n            rect(col * size, row * size, size, size, \"#333\")\n\n# Draw a heart shape (pixel coordinates)\nheart = [\n    \"  ##  ##  \",\n    \" ## #### \",\n    \"##########\",\n    \"##########\",\n    \" ######## \",\n    \"  ######  \",\n    \"   ####   \",\n    \"    ##    \",\n]\n\nfor row_idx, row_str in enumerate(heart):\n    for col_idx, ch in enumerate(row_str):\n        if ch == \"#\":\n            x = 130 + col_idx * size\n            y = 50 + row_idx * size\n            rect(x, y, size, size, \"red\")\n\ntext(120, 160, \"I <3 Python!\", \"hotpink\", 22)\nprint(\"Pixel art drawn on canvas!\")\nprint(\"Try editing the heart pattern above!\")\n",challenge:"<strong>Mission:</strong> Create your own pixel art! Draw a face, a spaceship, a tree, or your initials using nested loops or a string grid pattern like the heart example.",hint:"Define your art as a list of strings where # = filled pixel. Loop through rows and columns. Change the color for different characters!",check:function(o){return o.indexOf("[canvas]")!==-1;},project:false},
+{ch:2,title:"\ud83c\udfae Quiz Show",emoji:"\u2753",concepts:["dict", "list", "input()", "for", "if"],desc:"Build an interactive quiz YOU can play! Type your answers and get scored in real time.",code:"questions = [\n    {\"q\": \"What planet is closest to the Sun?\",\n     \"opts\": [\"A) Venus\", \"B) Mercury\", \"C) Mars\"], \"ans\": \"B\"},\n    {\"q\": \"How many legs does a spider have?\",\n     \"opts\": [\"A) 6\", \"B) 10\", \"C) 8\"], \"ans\": \"C\"},\n    {\"q\": \"What language are we learning?\",\n     \"opts\": [\"A) JavaScript\", \"B) Python\", \"C) Scratch\"], \"ans\": \"B\"},\n    {\"q\": \"What does CPU stand for?\",\n     \"opts\": [\"A) Central Processing Unit\",\n              \"B) Computer Personal Utility\",\n              \"C) Cool Program Updater\"], \"ans\": \"A\"},\n]\n\nscore = 0\ntotal = len(questions)\n\nprint(\"=== PYTHON QUIZ SHOW ===\")\nprint(f\"Answer all {total} questions!\\n\")\n\nfor i, q in enumerate(questions, 1):\n    print(f\"Q{i}: {q['q']}\")\n    for opt in q[\"opts\"]:\n        print(f\"   {opt}\")\n\n    guess = input(\"Your answer (A/B/C): \").strip().upper()\n\n    if guess == q[\"ans\"]:\n        print(\"   Correct!\\n\")\n        score += 1\n    else:\n        print(f\"   Wrong! Answer was {q['ans']}\\n\")\n\nprint(f\"Final Score: {score}/{total}\")\nif score == total:\n    print(\"PERFECT SCORE!\")\nelif score >= total * 0.75:\n    print(\"Great job!\")\nelse:\n    print(\"Keep studying!\")\n",challenge:"<strong>Project:</strong> Add 4+ questions about topics YOU know! Bonus: draw a score bar on the canvas showing your result.",hint:"Copy the format: <code>{\"q\": \"Your question?\", \"opts\": [\"A)...\", \"B)...\", \"C)...\"], \"ans\": \"B\"}</code>",check:function(o){return o.toLowerCase().indexOf("score")!==-1;},project:true},
+{ch:3,title:"Functions Basics",emoji:"\ud83c\udfd7\ufe0f",concepts:["def", "parameters", "calling"],desc:"Functions are reusable code blocks \u2014 custom commands you create! Use <code>def</code> to define one with a name and parameters (inputs).",code:"def greet(name):\n    print(f\"Hey {name}! Welcome to Python Quest!\")\n\ngreet(\"Alex\")\ngreet(\"Jordan\")\ngreet(\"Python Master\")\n\nprint()\n\ndef introduce(name, age, hobby):\n    print(f\"Meet {name}, age {age}, who loves {hobby}!\")\n\nintroduce(\"Sam\", 12, \"coding\")\nintroduce(\"Riley\", 10, \"soccer\")\n",challenge:"<strong>Mission:</strong> Write <code>celebrate(name, achievement)</code> that prints a celebration. Call it 3+ times.",hint:"<code>def celebrate(name, achievement):</code> then <code>print(f\"Congrats {name} on {achievement}!\")</code>",check:function(o){return o.trim().split("\n").filter(function(l){return l.trim();}).length>=3;},project:false},
+{ch:3,title:"Return Values",emoji:"\ud83d\udce4",concepts:["return", "storing results"],desc:"<code>return</code> sends a result back from a function. You can store it, print it, or use it in other calculations.",code:"def add(a, b):\n    return a + b\n\ndef is_even(n):\n    return n % 2 == 0\n\ndef letter_grade(score):\n    if score >= 90: return \"A\"\n    elif score >= 80: return \"B\"\n    elif score >= 70: return \"C\"\n    else: return \"F\"\n\nresult = add(15, 27)\nprint(f\"15 + 27 = {result}\")\nprint(f\"Is 4 even? {is_even(4)}\")\nprint(f\"Is 7 even? {is_even(7)}\")\nprint(f\"Score 88 = {letter_grade(88)}\")\n",challenge:"<strong>Mission:</strong> Write <code>is_even(n)</code> and <code>area_of_triangle(base, height)</code> that returns base * height / 2. Test both.",hint:"<code>return number % 2 == 0</code> for is_even. <code>return base * height / 2</code> for area.",check:function(o){return o.indexOf("True")!==-1&&o.indexOf("False")!==-1;},project:false},
+{ch:3,title:"Default Parameters",emoji:"\u2699\ufe0f",concepts:["defaults", "keyword args"],desc:"Parameters can have <strong>default values</strong>. You can also use <strong>keyword arguments</strong> to pass values by name.",code:"def make_sandwich(bread=\"white\", filling=\"PBJ\", toasted=False):\n    t = \"toasted \" if toasted else \"\"\n    print(f\"  {t}{bread} sandwich with {filling}\")\n\nprint(\"Orders:\")\nmake_sandwich()\nmake_sandwich(\"wheat\", \"turkey\")\nmake_sandwich(filling=\"ham\", toasted=True)\n\nprint()\n\ndef create_character(name, char_class=\"Warrior\", level=1):\n    print(f\"  {name} the {char_class} (Lv.{level})\")\n\nprint(\"Characters:\")\ncreate_character(\"Luna\")\ncreate_character(\"Zara\", \"Mage\", 5)\ncreate_character(\"Rex\", level=3)\n",challenge:"<strong>Mission:</strong> Write <code>order_pizza(size=\"medium\", crust=\"regular\", toppings=\"cheese\")</code>. Call it 4+ times with different combos.",hint:"Try: <code>order_pizza()</code>, <code>order_pizza(\"large\")</code>, <code>order_pizza(toppings=\"pepperoni\", size=\"small\")</code>.",check:function(o){return o.trim().split("\n").filter(function(l){return l.trim();}).length>=4;},project:false},
+{ch:3,title:"Randomness",emoji:"\ud83c\udfb0",concepts:["random", "randint", "choice", "shuffle"],desc:"The <code>random</code> module adds unpredictability! <code>randint(a,b)</code> for random integers, <code>choice(list)</code> for random picks.",code:"import random\n\nprint(\"Rolling 5 dice:\")\nfor i in range(5):\n    print(f\"  Die {i+1}: {random.randint(1, 6)}\")\n\nfoods = [\"pizza\", \"tacos\", \"sushi\", \"burgers\", \"ramen\"]\nprint(f\"\\nDinner: {random.choice(foods)}!\")\n\ncards = [\"Ace\", \"King\", \"Queen\", \"Jack\", \"10\"]\nrandom.shuffle(cards)\nprint(f\"Shuffled: {cards}\")\n",challenge:"<strong>Mission:</strong> Write <code>roll_dice(num_dice, sides=6)</code> that prints each roll and returns the total.",hint:"Loop <code>for i in range(num_dice):</code>, roll with <code>random.randint(1, sides)</code>, track total.",check:function(o){return o.trim().split("\n").filter(function(l){return l.trim();}).length>=4;},project:false},
+{ch:3,title:"\ud83c\udfae Drawing Functions",emoji:"\ud83c\udfa8",concepts:["def", "canvas", "reusable code"],desc:"Combine functions with drawing to create reusable art tools! Write functions that draw shapes, then call them to build complex scenes.",code:"import random\n\ndef draw_tree(x, y, size):\n    \"\"\"Draw a simple tree at position x, y\"\"\"\n    # Trunk\n    rect(x - size//6, y, size//3, size, \"saddlebrown\")\n    # Leaves (three circles)\n    circle(x, y - size//3, size//2, \"forestgreen\")\n    circle(x - size//3, y, size//3, \"green\")\n    circle(x + size//3, y, size//3, \"darkgreen\")\n\ndef draw_star(x, y, color):\n    \"\"\"Draw a simple star\"\"\"\n    for dx in range(-4, 5):\n        rect(x + dx * 3, y, 3, 3, color)\n        rect(x, y + dx * 3, 3, 3, color)\n\n# Build a scene!\nclear(\"midnightblue\")\n\n# Ground\nrect(0, 240, 400, 60, \"darkgreen\")\n\n# Trees\ndraw_tree(60, 200, 60)\ndraw_tree(180, 210, 50)\ndraw_tree(320, 195, 70)\n\n# Stars\nfor i in range(12):\n    sx = random.randint(10, 390)\n    sy = random.randint(10, 120)\n    draw_star(sx, sy, random.choice([\"white\", \"lightyellow\", \"gold\"]))\n\n# Moon\ncircle(340, 50, 30, \"lightyellow\")\ncircle(350, 45, 28, \"midnightblue\")  # crescent effect\n\ntext(80, 285, \"A Python Night\", \"white\", 22)\nprint(\"Night scene drawn!\")\n",challenge:"<strong>Project:</strong> Create your own drawing functions! Ideas: <code>draw_house(x, y)</code>, <code>draw_car(x, y, color)</code>, <code>draw_flower(x, y)</code>. Build a full scene with at least 3 custom functions.",hint:"Define functions like <code>def draw_house(x, y):</code> then use <code>rect()</code> and <code>circle()</code> inside. Call them multiple times at different positions.",check:function(o){return o.indexOf("[canvas]")!==-1;},project:true},
+{ch:4,title:"String Methods",emoji:"\ud83d\udd27",concepts:[".split()", ".join()", ".replace()", ".count()"],desc:"Strings have powerful methods: <code>.split()</code> breaks into a list, <code>.join()</code> combines, <code>.replace()</code> swaps text, <code>.count()</code> counts occurrences.",code:"sentence = \"Python is fun and Python is powerful\"\nwords = sentence.split()\nprint(f\"Words: {words}\")\nprint(f\"Word count: {len(words)}\")\nprint(\" | \".join(words))\nprint(sentence.replace(\"Python\", \"Coding\"))\nprint(f\"Python appears {sentence.count('Python')} times\")\nprint(\"hello world\".title().replace(\" \", \"-\"))\n",challenge:"<strong>Mission:</strong> Write <code>word_stats(text)</code> that prints word count, character count (no spaces), and the longest word.",hint:"<code>text.replace(\" \", \"\")</code> for chars without spaces. Longest: <code>max(words, key=len)</code>.",check:function(o){return o.trim().split("\n").filter(function(l){return l.trim();}).length>=3;},project:false},
+{ch:4,title:"List Comprehensions",emoji:"\ud83d\udd2a",concepts:["[expr for x in list]", "filtering", "slicing"],desc:"<strong>List comprehensions</strong> build new lists in one line: <code>[expr for item in list]</code>. Add <code>if</code> to filter. Also learn <strong>slicing</strong>: <code>list[start:end]</code>.",code:"nums = [0,1,2,3,4,5,6,7,8,9]\nprint(f\"First 4: {nums[:4]}\")\nprint(f\"Last 3: {nums[-3:]}\")\nprint(f\"Reversed: {nums[::-1]}\")\n\nsquares = [x**2 for x in range(1, 8)]\nprint(f\"Squares: {squares}\")\n\nevens = [x for x in range(20) if x % 2 == 0]\nprint(f\"Evens: {evens}\")\n\nwords = [\"hello\", \"world\", \"python\"]\nshouted = [w.upper() for w in words]\nprint(f\"Shouted: {shouted}\")\n",challenge:"<strong>Mission:</strong> Find all numbers 1-50 divisible by both 3 AND 5. Then square only odd numbers from 1-20.",hint:"<code>[x for x in range(1,51) if x%3==0 and x%5==0]</code>. Odd squares: <code>[x**2 for x in range(1,21) if x%2!=0]</code>.",check:function(o){return o.indexOf("15")!==-1&&o.indexOf("45")!==-1;},project:false},
+{ch:4,title:"Error Handling",emoji:"\ud83d\udee1\ufe0f",concepts:["try", "except", "handling errors"],desc:"Catch errors with <code>try/except</code> instead of crashing. Handle different error types separately.",code:"# This would crash without try/except:\ntry:\n    result = 10 / 0\nexcept ZeroDivisionError:\n    print(\"Cannot divide by zero!\")\n\nprint(\"Program keeps running!\")\n\ndef safe_divide(a, b):\n    try:\n        return f\"{a} / {b} = {a/b:.2f}\"\n    except ZeroDivisionError:\n        return \"Cannot divide by zero!\"\n    except TypeError:\n        return \"Please use numbers only!\"\n\nprint(safe_divide(10, 3))\nprint(safe_divide(10, 0))\nprint(safe_divide(\"hello\", 5))\n",challenge:"<strong>Mission:</strong> Write <code>safe_calc(a, op, b)</code> that handles +,-,*,/ with try/except for errors.",hint:"Use if/elif for operators. Wrap division in try/except. Add <code>else: return \"Unknown operator\"</code>.",check:function(o){return o.trim().split("\n").filter(function(l){return l.trim();}).length>=3;},project:false},
+{ch:4,title:"Sets & Tuples",emoji:"\ud83c\udfad",concepts:["set{}", "tuple()", "unique", "&", "|"],desc:"<strong>Tuples</strong> <code>()</code> are unchangeable lists. <strong>Sets</strong> <code>{}</code> hold unique items only \u2014 great for removing duplicates and comparing groups.",code:"# Tuples - unchangeable\ncoords = (10, 20)\nx, y = coords\nprint(f\"x={x}, y={y}\")\n\n# Sets - unique items only!\nnumbers = {3,1,4,1,5,9,2,6,5,3}\nprint(f\"Unique: {numbers}\")\n\nmy_games = {\"Minecraft\", \"Zelda\", \"Fortnite\", \"Roblox\"}\nfriend_games = {\"Minecraft\", \"Among Us\", \"Fortnite\", \"Rocket League\"}\n\nprint(f\"Both play: {my_games & friend_games}\")\nprint(f\"All games: {my_games | friend_games}\")\nprint(f\"Only me: {my_games - friend_games}\")\n",challenge:"<strong>Mission:</strong> Make two sets of favorite foods (yours and a friend). Find shared, unique, and combined.",hint:"Use <code>&</code> for shared, <code>-</code> for unique, <code>|</code> for all.",check:function(o){return o.trim().split("\n").filter(function(l){return l.trim();}).length>=3;},project:false},
+{ch:4,title:"\ud83c\udfae Data Visualizer",emoji:"\ud83d\udcca",concepts:["canvas", "functions", "lists", "math"],desc:"Build a visual data dashboard! Combine drawing with data analysis to create bar charts and graphs on the canvas.",code:"import random\n\ndef draw_bar_chart(data, labels, title):\n    \"\"\"Draw a bar chart on the canvas!\"\"\"\n    clear(\"#1a1a2e\")\n    max_val = max(data)\n    bar_width = 35\n    gap = 10\n    start_x = 40\n    chart_height = 200\n    base_y = 250\n\n    # Title\n    text(100, 25, title, \"white\", 20)\n\n    # Bars\n    colors = [\"#e94560\", \"#0f3460\", \"#16c79a\", \"#f5a623\",\n              \"#8b5cf6\", \"#06d6a0\", \"#ef476f\", \"#118ab2\"]\n    for i, val in enumerate(data):\n        bar_h = int((val / max_val) * chart_height)\n        x = start_x + i * (bar_width + gap)\n        y = base_y - bar_h\n        color = colors[i % len(colors)]\n        rect(x, y, bar_width, bar_h, color)\n        # Value label\n        text(x + 5, y - 15, str(val), \"white\", 12)\n        # Category label\n        text(x, base_y + 15, labels[i], \"#888\", 10)\n\n    # Axis line\n    line(35, base_y, 390, base_y, \"#444\", 2)\n    line(35, 40, 35, base_y, \"#444\", 2)\n\n# Sample data\nscores = [random.randint(50, 100) for _ in range(8)]\nnames = [\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\", \"Avg\"]\nscores[-1] = sum(scores[:-1]) // 7  # actual average\n\ndraw_bar_chart(scores, names, \"Weekly Quiz Scores\")\n\n# Also print the stats\nprint(\"=== SCORE ANALYSIS ===\")\nprint(f\"  Scores: {scores[:-1]}\")\nprint(f\"  Average: {scores[-1]}\")\nprint(f\"  Best: {max(scores[:-1])}\")\nprint(f\"  Worst: {min(scores[:-1])}\")\n",challenge:"<strong>Project:</strong> Create your own dataset and visualize it! Ideas: favorite game ratings, hours spent on activities, temperatures this week. Add colors, labels, and print statistics.",hint:"Change the <code>scores</code> and <code>names</code> lists. Try adding a horizontal line for the average using <code>line()</code>.",check:function(o){return o.indexOf("[canvas]")!==-1||o.toLowerCase().indexOf("analysis")!==-1;},project:true},
+{ch:5,title:"Classes & Objects",emoji:"\ud83c\udf93",concepts:["class", "__init__", "self", "methods"],desc:"Classes are <strong>blueprints</strong> for creating objects \u2014 things with their own data and abilities.",code:"class Pet:\n    def __init__(self, name, species, age):\n        self.name = name\n        self.species = species\n        self.age = age\n        self.hunger = 50\n        self.happiness = 50\n\n    def feed(self):\n        self.hunger = max(0, self.hunger - 25)\n        self.happiness = min(100, self.happiness + 10)\n        print(f\"  Fed {self.name}! Hunger:{self.hunger} Happy:{self.happiness}\")\n\n    def play(self):\n        self.hunger = min(100, self.hunger + 15)\n        self.happiness = min(100, self.happiness + 20)\n        print(f\"  Played with {self.name}! Hunger:{self.hunger} Happy:{self.happiness}\")\n\ndog = Pet(\"Buddy\", \"Golden Retriever\", 3)\ncat = Pet(\"Whiskers\", \"Cat\", 7)\n\nprint(f\"{dog.name} the {dog.species}\")\ndog.feed()\ndog.play()\nprint(f\"\\n{cat.name} the {cat.species}\")\ncat.feed()\n",challenge:"<strong>Mission:</strong> Create a <code>Student</code> class with name, grade, subjects list. Add <code>add_subject()</code> and <code>report_card()</code> methods. Create 2 students.",hint:"<code>def __init__(self, name, grade): self.subjects = []</code>. <code>def add_subject(self, s): self.subjects.append(s)</code>",check:function(o){return o.trim().split("\n").filter(function(l){return l.trim();}).length>=6;},project:false},
+{ch:5,title:"Class Interactions",emoji:"\u2694\ufe0f",concepts:["__str__", "methods", "object interaction"],desc:"<code>__str__</code> controls what <code>print()</code> shows. Methods can modify data and interact with other objects.",code:"class BankAccount:\n    def __init__(self, owner, balance=0):\n        self.owner = owner\n        self.balance = balance\n\n    def __str__(self):\n        return f\"  {self.owner} Account: ${self.balance:.2f}\"\n\n    def deposit(self, amt):\n        self.balance += amt\n        print(f\"  +${amt:.2f} deposited\")\n\n    def withdraw(self, amt):\n        if amt > self.balance:\n            print(\"  Insufficient funds!\")\n            return False\n        self.balance -= amt\n        print(f\"  -${amt:.2f} withdrawn\")\n        return True\n\n    def transfer(self, other, amt):\n        if self.withdraw(amt):\n            other.deposit(amt)\n\nalice = BankAccount(\"Alice\", 500)\nbob = BankAccount(\"Bob\", 200)\nprint(alice)\nprint(bob)\nprint()\nalice.deposit(100)\nalice.transfer(bob, 250)\nprint()\nprint(alice)\nprint(bob)\n",challenge:"<strong>Mission:</strong> Add a <code>show_history()</code> method that tracks all transactions. Test transfers between accounts.",hint:"Add <code>self.history = []</code> in __init__. Append to it in deposit/withdraw.",check:function(o){return o.trim().split("\n").filter(function(l){return l.trim();}).length>=6;},project:false},
+{ch:5,title:"Lists of Objects",emoji:"\ud83d\uddc2\ufe0f",concepts:["objects in lists", "sorting", "filtering"],desc:"Combine classes with lists for real power! Search, filter, sort collections \u2014 like a mini database.",code:"class Game:\n    def __init__(self, title, genre, rating, hours):\n        self.title = title\n        self.genre = genre\n        self.rating = rating\n        self.hours = hours\n\nlibrary = [\n    Game(\"Minecraft\", \"Sandbox\", 5, 500),\n    Game(\"Fortnite\", \"BR\", 4, 200),\n    Game(\"Zelda TOTK\", \"Adventure\", 5, 150),\n    Game(\"Rocket League\", \"Sports\", 4, 300),\n    Game(\"Stardew Valley\", \"Sim\", 5, 180),\n    Game(\"Among Us\", \"Party\", 3, 50),\n]\n\nprint(\"MY GAME LIBRARY\")\nfor g in library:\n    stars = \"*\" * g.rating\n    print(f\"  {stars} {g.title} ({g.genre}) {g.hours}hrs\")\n\nprint(\"\\n5-STAR GAMES:\")\nfor g in library:\n    if g.rating == 5:\n        print(f\"  {g.title}\")\n\nprint(\"\\nMOST PLAYED:\")\nby_hours = sorted(library, key=lambda g: g.hours, reverse=True)\nfor g in by_hours[:3]:\n    print(f\"  {g.hours}hrs - {g.title}\")\n\nprint(f\"\\nTotal hours: {sum(g.hours for g in library)}\")\n",challenge:"<strong>Mission:</strong> Create a <code>Song</code> class (title, artist, seconds). Build a 6+ song playlist. Print total duration as min:sec, find the longest.",hint:"Total: <code>sum(s.seconds for s in pl)</code>. Convert: <code>mins=total//60, secs=total%60</code>.",check:function(o){return o.trim().split("\n").filter(function(l){return l.trim();}).length>=6;},project:false},
+{ch:5,title:"Combining Everything",emoji:"\ud83e\udde9",concepts:["design", "all concepts"],desc:"You know it all now \u2014 variables, strings, decisions, loops, lists, dicts, functions, classes, drawing, input! Let's combine them.",code:"import random\n\nclass Player:\n    def __init__(self, name):\n        self.name = name\n        self.score = 0\n        self.streak = 0\n\n    def correct(self, pts):\n        self.score += pts\n        self.streak += 1\n        if self.streak >= 3:\n            bonus = self.streak * 2\n            self.score += bonus\n            print(f\"  {self.streak}-STREAK! +{bonus} bonus!\")\n\n    def wrong(self):\n        self.streak = 0\n\ndef math_game(player, rounds=6):\n    ops = {\"+\": lambda a,b:a+b, \"-\": lambda a,b:a-b, \"x\": lambda a,b:a*b}\n    print(f\"\\nMATH BLITZ for {player.name}!\\n\")\n\n    for r in range(1, rounds+1):\n        a = random.randint(2, 15)\n        b = random.randint(2, 12)\n        op = random.choice(list(ops.keys()))\n        correct_ans = ops[op](a, b)\n\n        ans_text = input(f\"  Q{r}: {a} {op} {b} = ? \")\n        try:\n            ans = int(ans_text)\n        except:\n            ans = -1\n\n        if ans == correct_ans:\n            player.correct(10)\n            print(f\"  Correct! ({player.score}pts)\")\n        else:\n            player.wrong()\n            print(f\"  Nope, it was {correct_ans}. ({player.score}pts)\")\n\n    print(f\"\\nFinal score: {player.score}pts\")\n\np = Player(input(\"Enter your name: \"))\nmath_game(p)\n",challenge:"<strong>Mission:</strong> Add division, difficulty modes, or a visual scoreboard drawn on the canvas!",hint:"For canvas scoreboard: <code>clear(\"black\")</code> then draw a bar whose width = player.score.",check:function(o){return o.indexOf("score")!==-1||o.indexOf("Final")!==-1;},project:false},
+{ch:5,title:"\ud83c\udfae RPG Battle!",emoji:"\u2694\ufe0f",concepts:["classes", "canvas", "random", "everything!"],desc:"Your FINAL project: a turn-based RPG with visual HP bars drawn on the canvas! Everything you learned in one epic program.",code:"import random\n\nclass Fighter:\n    def __init__(self, name, hp, atk, defense, color):\n        self.name = name\n        self.max_hp = hp\n        self.hp = hp\n        self.atk = atk\n        self.defense = defense\n        self.color = color\n        self.potions = 2\n\n    def alive(self):\n        return self.hp > 0\n\n    def attack(self, target):\n        roll = random.randint(1, 20)\n        if roll == 20:\n            dmg = max(1, self.atk * 2 - target.defense // 3)\n            target.hp = max(0, target.hp - dmg)\n            print(f\"  CRITICAL! {self.name} deals {dmg} damage!\")\n        elif roll <= 2:\n            print(f\"  {self.name} missed!\")\n        else:\n            dmg = max(1, random.randint(self.atk//2, self.atk) - target.defense//3)\n            target.hp = max(0, target.hp - dmg)\n            print(f\"  {self.name} attacks for {dmg} damage!\")\n\n    def heal(self):\n        if self.potions > 0:\n            h = random.randint(20, 35)\n            self.hp = min(self.max_hp, self.hp + h)\n            self.potions -= 1\n            print(f\"  {self.name} heals +{h} HP! ({self.potions} potions left)\")\n\ndef draw_battle(hero, boss, turn):\n    clear(\"#1a1a2e\")\n    text(150, 25, \"RPG BATTLE\", \"white\", 22)\n    text(170, 50, f\"Turn {turn}\", \"#888\", 14)\n\n    # Hero HP bar\n    text(20, 85, f\"{hero.name}\", hero.color, 16)\n    rect(20, 95, 170, 20, \"#333\")\n    hw = int((hero.hp / hero.max_hp) * 170)\n    rect(20, 95, hw, 20, hero.color)\n    text(200, 110, f\"{hero.hp}/{hero.max_hp}\", \"white\", 12)\n\n    # Boss HP bar\n    text(20, 135, f\"{boss.name}\", boss.color, 16)\n    rect(20, 145, 170, 20, \"#333\")\n    bw = int((boss.hp / boss.max_hp) * 170)\n    rect(20, 145, bw, 20, boss.color)\n    text(200, 160, f\"{boss.hp}/{boss.max_hp}\", \"white\", 12)\n\n    # Draw fighters\n    rect(60, 200, 50, 60, hero.color)\n    circle(85, 190, 20, hero.color)\n    rect(290, 200, 50, 60, boss.color)\n    circle(315, 190, 20, boss.color)\n\ndef battle(hero, boss):\n    print(\"=\" * 40)\n    print(f\"  {hero.name}  VS  {boss.name}\")\n    print(\"=\" * 40)\n\n    turn = 1\n    while hero.alive() and boss.alive():\n        draw_battle(hero, boss, turn)\n        print(f\"\\n--- Turn {turn} ---\")\n        print(f\"  {hero.name}: {hero.hp}/{hero.max_hp} HP\")\n        print(f\"  {boss.name}: {boss.hp}/{boss.max_hp} HP\")\n\n        # Hero turn\n        if hero.hp < hero.max_hp * 0.3 and hero.potions > 0:\n            hero.heal()\n        else:\n            hero.attack(boss)\n\n        if not boss.alive():\n            break\n\n        # Boss turn\n        if boss.hp < boss.max_hp * 0.25 and boss.potions > 0:\n            boss.heal()\n        else:\n            boss.attack(hero)\n\n        turn += 1\n\n    draw_battle(hero, boss, turn)\n\n    print(\"\\n\" + \"=\" * 40)\n    if hero.alive():\n        text(100, 280, \"VICTORY!\", \"gold\", 28)\n        print(f\"  {hero.name} WINS with {hero.hp} HP!\")\n    else:\n        text(110, 280, \"DEFEAT...\", \"red\", 28)\n        print(f\"  {boss.name} wins...\")\n    print(\"=\" * 40)\n\nhero = Fighter(\"PyKnight\", 100, 22, 8, \"#4fc3f7\")\nboss = Fighter(\"BugDragon\", 120, 18, 5, \"#e57373\")\nbattle(hero, boss)\n",challenge:"<strong>FINAL PROJECT:</strong> Make it EPIC! Add special moves, a gauntlet of monsters, XP + leveling, character classes, or player choice with <code>input()</code>!",hint:"Add input: <code>action = input(\"Attack or Heal? \")</code>. Special moves: add cooldown counter. Gauntlet: loop through a list of bosses.",check:function(o){return o.indexOf("====")!==-1||o.indexOf("VS")!==-1||o.length>200;},project:true}
 ];
+var SANDBOX_CODE="# 🎨 Free Play Sandbox\n# Write anything you want!\n#\n# Try: import canvas, build games with input(),\n# draw pixel art, or invent something new!\n\nimport random\n\nclear(\"navy\")\ncircle(200, 150, 80, \"gold\")\ntext(120, 160, \"Sandbox!\", \"white\", 28)\n\nprint(\"Welcome to the sandbox!\")\nprint(\"Your imagination is the only limit.\")\n";
 
-// ══════════════════════════════════════════════════════════
-//  SANDBOX MODE
-// ══════════════════════════════════════════════════════════
-const SANDBOX = {
-  title: "🎨 Free Play Sandbox",
-  desc: "This is YOUR space to experiment freely — no challenges, no rules. Write whatever Python you want! Try building a calculator, making ASCII art, creating a password generator, writing a chatbot, simulating a card game, or inventing something totally new.",
-  code: '# 🎨 FREE PLAY SANDBOX\n# Write anything you want here!\n#\n# Project ideas to try:\n#   - Build a tip calculator\n#   - Make ASCII art pictures\n#   - Create a random password generator\n#   - Write a simple encryption tool\n#   - Build a to-do list manager\n#   - Simulate a card game\n#   - Make a unit converter (miles to km, etc)\n#   - Build a mini chatbot\n\nimport random\n\nprint("Welcome to the Sandbox!")\nprint("Your imagination is the only limit.")\nprint(f"Here is a random number to start: {random.randint(1, 100)}")\nprint()\n# ↓ Start coding below ↓\n\n',
-};
+// ═══ CANVAS API (called from Python) ═══
+var _cv=document.getElementById("cv");
+var _cx=_cv.getContext("2d");
+function _showCanvas(){document.getElementById("cw").style.display="block";}
+window._pq_clear=function(c){_showCanvas();_cx.fillStyle=c||"black";_cx.fillRect(0,0,400,300);};
+window._pq_rect=function(x,y,w,h,c){_showCanvas();_cx.fillStyle=c||"white";_cx.fillRect(x,y,w,h);};
+window._pq_circle=function(x,y,r,c){_showCanvas();_cx.fillStyle=c||"white";_cx.beginPath();_cx.arc(x,y,r,0,6.2832);_cx.fill();};
+window._pq_line=function(x1,y1,x2,y2,c,w){_showCanvas();_cx.strokeStyle=c||"white";_cx.lineWidth=w||2;_cx.beginPath();_cx.moveTo(x1,y1);_cx.lineTo(x2,y2);_cx.stroke();};
+window._pq_text=function(x,y,t,c,s){_showCanvas();_cx.fillStyle=c||"white";_cx.font=(s||16)+"px 'Fredoka',sans-serif";_cx.fillText(t,x,y);};
 
-// ══════════════════════════════════════════════════════════
-//  STATE MANAGEMENT
-// ══════════════════════════════════════════════════════════
-let currentIdx = 0;
-let inSandbox = false;
-let completed = new Set();
-let pyodide = null;
-let editor = null;
-let savedCode = {};
-let isRunning = false;
+// ═══ STATE ═══
+var cur=0,sandbox=false,done=new Set(),pyodide=null,editor=null,running=false,saved={};
+function loadSt(){try{var a=localStorage.getItem("pq4d");if(a)done=new Set(JSON.parse(a));var b=localStorage.getItem("pq4i");if(b!==null)cur=Math.min(parseInt(b),LESSONS.length-1);var c=localStorage.getItem("pq4s");if(c)saved=JSON.parse(c);}catch(e){}}
+function saveSt(){try{localStorage.setItem("pq4d",JSON.stringify(Array.from(done)));localStorage.setItem("pq4i",String(cur));localStorage.setItem("pq4s",JSON.stringify(saved));}catch(e){}}
+function streak(){try{var t=new Date().toDateString(),l=localStorage.getItem("pq4l"),s=parseInt(localStorage.getItem("pq4k")||"0");if(l!==t){var y=new Date(Date.now()-864e5).toDateString();s=(l===y)?s+1:1;localStorage.setItem("pq4k",String(s));localStorage.setItem("pq4l",t);}document.getElementById("stk").textContent=s;}catch(e){}}
 
-function loadState() {
-  try {
-    var c = localStorage.getItem('pq3_completed');
-    if (c) completed = new Set(JSON.parse(c));
-    var i = localStorage.getItem('pq3_index');
-    if (i !== null) currentIdx = Math.min(parseInt(i), LESSONS.length - 1);
-    var s = localStorage.getItem('pq3_saved');
-    if (s) savedCode = JSON.parse(s);
-  } catch (e) { /* first visit */ }
-}
-
-function saveState() {
-  try {
-    localStorage.setItem('pq3_completed', JSON.stringify(Array.from(completed)));
-    localStorage.setItem('pq3_index', String(currentIdx));
-    localStorage.setItem('pq3_saved', JSON.stringify(savedCode));
-  } catch (e) {}
-}
-
-function updateStreak() {
-  try {
-    var today = new Date().toDateString();
-    var lastVisit = localStorage.getItem('pq3_last');
-    var streak = parseInt(localStorage.getItem('pq3_streak') || '0');
-    if (lastVisit !== today) {
-      var yesterday = new Date(Date.now() - 86400000).toDateString();
-      streak = (lastVisit === yesterday) ? streak + 1 : 1;
-      localStorage.setItem('pq3_streak', String(streak));
-      localStorage.setItem('pq3_last', today);
-    }
-    document.getElementById('streakVal').textContent = streak;
-  } catch (e) {}
-}
-
-// ══════════════════════════════════════════════════════════
-//  INITIALIZATION
-// ══════════════════════════════════════════════════════════
-async function init() {
-  loadState();
-  updateStreak();
-
-  // Initialize CodeMirror editor
-  editor = CodeMirror.fromTextArea(document.getElementById('editorArea'), {
-    mode: 'python',
-    theme: 'dracula',
-    lineNumbers: true,
-    autoCloseBrackets: true,
-    tabSize: 4,
-    indentUnit: 4,
-    indentWithTabs: false,
-    lineWrapping: true,
-    extraKeys: {
-      'Tab': function(cm) { cm.replaceSelection('    '); },
-      'Ctrl-Enter': function() { runCode(); },
-      'Cmd-Enter': function() { runCode(); },
-    }
+// ═══ INIT ═══
+async function init(){
+  loadSt();streak();
+  editor=CodeMirror.fromTextArea(document.getElementById("ea"),{
+    mode:"python",theme:"dracula",lineNumbers:true,autoCloseBrackets:true,
+    tabSize:4,indentUnit:4,indentWithTabs:false,lineWrapping:true,
+    extraKeys:{"Tab":function(cm){cm.replaceSelection("    ")},"Ctrl-Enter":function(){runCode()},"Cmd-Enter":function(){runCode()}}
   });
+  buildSB();loadLesson(cur);
+  try{
+    pyodide=await loadPyodide({indexURL:"https://cdn.jsdelivr.net/pyodide/v0.24.1/full/"});
+    // Register canvas drawing functions accessible from Python
+    await pyodide.runPythonAsync([
+      "from js import window",
+      "import builtins",
+      "",
+      "def clear(color='black'):",
+      "    window._pq_clear(color)",
+      "    print('[canvas] cleared')",
+      "",
+      "def rect(x, y, w, h, color='white'):",
+      "    window._pq_rect(x, y, w, h, color)",
+      "",
+      "def circle(x, y, r, color='white'):",
+      "    window._pq_circle(x, y, r, color)",
+      "",
+      "def line(x1, y1, x2, y2, color='white', width=2):",
+      "    window._pq_line(x1, y1, x2, y2, color, width)",
+      "",
+      "def text(x, y, msg, color='white', size=16):",
+      "    window._pq_text(x, y, str(msg), color, size)",
+      "",
+      "# Override input() to use browser prompt with the actual prompt text",
+      "_orig_input = builtins.input",
+      "def _custom_input(prompt=''):",
+      "    from js import window",
+      "    result = window.prompt(prompt or 'Type here:')",
+      "    if result is None: result = ''",
+      "    if prompt: print(f'{prompt}{result}')",
+      "    else: print(result)",
+      "    return result",
+      "builtins.input = _custom_input",
+    ].join("\n"));
+    document.getElementById("ld").classList.add("hid");
+  }catch(e){
+    console.error("Pyodide error:",e);
+    document.querySelector(".loading h2").textContent="Trouble loading Python...";
+    document.querySelector(".loading p").textContent="Try refreshing. Check your internet connection.";
+  }
+}
 
-  // Build UI and load the current lesson
-  buildSidebar();
-  loadLesson(currentIdx);
-
-  // Load Pyodide (Python engine)
-  try {
-    pyodide = await loadPyodide({
-      indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/'
+// ═══ SIDEBAR ═══
+function buildSB(){
+  var el=document.getElementById("sl"),h="";
+  CHAPTERS.forEach(function(ch,ci){
+    var cls=[];for(var i=0;i<LESSONS.length;i++)if(LESSONS[i].ch===ci)cls.push({l:LESSONS[i],gi:i});
+    var allDone=cls.every(function(x){return done.has(x.gi);});
+    var col=localStorage.getItem("pq4c"+ci)==="1";
+    h+='<div class="ch-hdr'+(col?' col':'')+'" onclick="togCh('+ci+',this)"><span class="ar">▼</span><span>Ch '+(ci+1)+': '+ch.name+'</span><span class="bdg'+(allDone?' on':'')+'">'+ch.badge+'</span></div>';
+    h+='<div class="ch-ls" style="max-height:'+(col?'0':'600')+'px">';
+    cls.forEach(function(x){
+      h+='<button class="lbtn'+(x.gi===cur&&!sandbox?' act':'')+(done.has(x.gi)?' done':'')+(x.l.project?' prj':'')+'" onclick="loadLesson('+x.gi+')"><span class="em">'+x.l.emoji+'</span><span class="lb">'+x.l.title+'</span><span class="ck">'+(done.has(x.gi)?'✅':'○')+'</span></button>';
     });
-
-    // Override input() to use browser prompts
-    await pyodide.runPythonAsync(
-      'import sys\n' +
-      'from io import StringIO\n' +
-      'class _BrowserInput:\n' +
-      '    def readline(self):\n' +
-      '        from js import prompt\n' +
-      '        result = prompt("Python input:")\n' +
-      '        if result is None: result = ""\n' +
-      '        print(result)\n' +
-      '        return result + "\\n"\n' +
-      'sys.stdin = _BrowserInput()\n'
-    );
-
-    document.getElementById('loadingScreen').classList.add('hidden');
-  } catch (err) {
-    console.error('Pyodide load error:', err);
-    document.querySelector('.loading h2').textContent = 'Trouble loading Python...';
-    document.querySelector('.loading p').textContent =
-      'Try refreshing the page. Make sure you have an internet connection.';
-  }
-}
-
-// ══════════════════════════════════════════════════════════
-//  SIDEBAR
-// ══════════════════════════════════════════════════════════
-function buildSidebar() {
-  var container = document.getElementById('sidebarContent');
-  var html = '';
-
-  CHAPTERS.forEach(function(ch, ci) {
-    // Find all lessons in this chapter
-    var chLessons = [];
-    for (var li = 0; li < LESSONS.length; li++) {
-      if (LESSONS[li].ch === ci) chLessons.push({ lesson: LESSONS[li], idx: li });
-    }
-
-    // Check if entire chapter is complete
-    var chDone = chLessons.every(function(item) { return completed.has(item.idx); });
-    var isCollapsed = localStorage.getItem('pq3_ch' + ci + '_col') === '1';
-
-    html += '<div class="sidebar-section">';
-    html += '<div class="chapter-hdr' + (isCollapsed ? ' collapsed' : '') + '" onclick="toggleChapter(' + ci + ', this)">';
-    html += '<span class="arrow">▼</span>';
-    html += '<span>Ch ' + (ci + 1) + ': ' + ch.name + '</span>';
-    html += '<span class="badge' + (chDone ? ' earned' : '') + '">' + ch.badge + '</span>';
-    html += '</div>';
-    html += '<div class="ch-lessons" style="max-height:' + (isCollapsed ? '0' : '600') + 'px">';
-
-    chLessons.forEach(function(item) {
-      var l = item.lesson;
-      var gi = item.idx;
-      var isActive = gi === currentIdx && !inSandbox;
-      var isDone = completed.has(gi);
-      var isProject = !!l.project;
-
-      html += '<button class="lesson-btn';
-      if (isActive) html += ' active';
-      if (isDone) html += ' completed';
-      if (isProject) html += ' project';
-      html += '" onclick="loadLesson(' + gi + ')">';
-      html += '<span class="em">' + l.emoji + '</span>';
-      html += '<span class="label">' + l.title + '</span>';
-      html += '<span class="check">' + (isDone ? '✅' : '○') + '</span>';
-      html += '</button>';
-    });
-
-    html += '</div></div>';
+    h+='</div>';
   });
-
-  container.innerHTML = html;
-
-  // Update sandbox button state
-  document.getElementById('sandboxLink').classList.toggle('active', inSandbox);
-
-  // Update progress bar
-  updateProgress();
+  el.innerHTML=h;
+  document.getElementById("sbxb").classList.toggle("act",sandbox);
+  var pct=(done.size/LESSONS.length)*100;
+  document.getElementById("pf").style.width=pct+"%";
+  document.getElementById("pv").textContent=done.size+"/"+LESSONS.length;
 }
+function togCh(ci,el){el.classList.toggle("col");var ls=el.nextElementSibling;if(el.classList.contains("col")){ls.style.maxHeight="0";localStorage.setItem("pq4c"+ci,"1");}else{ls.style.maxHeight="600px";localStorage.removeItem("pq4c"+ci);}}
 
-function toggleChapter(ci, el) {
-  el.classList.toggle('collapsed');
-  var lessonsDiv = el.nextElementSibling;
-  if (el.classList.contains('collapsed')) {
-    lessonsDiv.style.maxHeight = '0px';
-    localStorage.setItem('pq3_ch' + ci + '_col', '1');
-  } else {
-    lessonsDiv.style.maxHeight = '600px';
-    localStorage.removeItem('pq3_ch' + ci + '_col');
-  }
+// ═══ LOAD LESSON ═══
+function saveCur(){if(!editor)return;saved[sandbox?"sandbox":String(cur)]=editor.getValue();}
+function loadLesson(i){
+  saveCur();sandbox=false;cur=i;saveSt();var l=LESSONS[i];
+  document.getElementById("ln").textContent="Mission "+(i+1)+" of "+LESSONS.length;
+  document.getElementById("lt").textContent=l.emoji+" "+l.title;
+  document.getElementById("ld2").innerHTML=l.desc;
+  document.getElementById("cT").innerHTML=l.challenge;
+  document.getElementById("hT").innerHTML=l.hint;
+  document.getElementById("cBox2").style.display="flex";
+  document.getElementById("hb").style.display="";
+  document.getElementById("hBox").classList.remove("show");
+  document.getElementById("ch").innerHTML=l.concepts.map(function(c){return'<span class="chip">'+c+'</span>';}).join("");
+  editor.setValue(saved[String(i)]||l.code);editor.clearHistory();
+  setTimeout(function(){editor.refresh();},20);
+  buildSB();clearOutput();document.getElementById("sb").classList.remove("open");
 }
-
-function updateProgress() {
-  var pct = (completed.size / LESSONS.length) * 100;
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressVal').textContent = completed.size + '/' + LESSONS.length;
+function loadSandbox(){
+  saveCur();sandbox=true;
+  document.getElementById("ln").textContent="Free Play";
+  document.getElementById("lt").textContent="🎨 Free Play Sandbox";
+  document.getElementById("ld2").innerHTML="Write whatever Python you want! Use drawing commands, input(), or just experiment freely.";
+  document.getElementById("cBox2").style.display="none";
+  document.getElementById("hb").style.display="none";
+  document.getElementById("hBox").classList.remove("show");
+  document.getElementById("ch").innerHTML="";
+  editor.setValue(saved["sandbox"]||SANDBOX_CODE);editor.clearHistory();
+  setTimeout(function(){editor.refresh();},20);
+  buildSB();clearOutput();document.getElementById("sb").classList.remove("open");
 }
+function resetCode(){if(sandbox){editor.setValue(SANDBOX_CODE);delete saved["sandbox"];}else{editor.setValue(LESSONS[cur].code);delete saved[String(cur)];}editor.clearHistory();saveSt();}
+function toggleHint(){document.getElementById("hBox").classList.toggle("show");}
+function clearOutput(){document.getElementById("ow").innerHTML='<div class="oph"><span class="be">👆</span>Hit <strong>▶ Run</strong> to see your code come to life!</div>';document.getElementById("cw").style.display="none";}
 
-// ══════════════════════════════════════════════════════════
-//  LESSON LOADING
-// ══════════════════════════════════════════════════════════
-function saveCurrentCode() {
-  if (!editor) return;
-  var key = inSandbox ? 'sandbox' : String(currentIdx);
-  savedCode[key] = editor.getValue();
-}
-
-function loadLesson(index) {
-  saveCurrentCode();
-  inSandbox = false;
-  currentIdx = index;
-  saveState();
-
-  var lesson = LESSONS[index];
-
-  // Update lesson info panel
-  document.getElementById('lessonNum').textContent =
-    'Mission ' + (index + 1) + ' of ' + LESSONS.length;
-  document.getElementById('lessonTitle').textContent =
-    lesson.emoji + ' ' + lesson.title;
-  document.getElementById('lessonDesc').innerHTML = lesson.desc;
-  document.getElementById('challengeText').innerHTML = lesson.challenge;
-  document.getElementById('hintText').innerHTML = lesson.hint;
-
-  // Show challenge box and hint button
-  document.getElementById('challengeBox').style.display = 'flex';
-  document.getElementById('hintBtn').style.display = '';
-  document.getElementById('hintBox').classList.remove('show');
-
-  // Concept chips
-  document.getElementById('chips').innerHTML =
-    lesson.concepts.map(function(c) {
-      return '<span class="chip">' + c + '</span>';
-    }).join('');
-
-  // Load code — use saved code if available, otherwise starter code
-  var code = savedCode[String(index)] || lesson.code;
-  editor.setValue(code);
-  editor.clearHistory();
-  setTimeout(function() { editor.refresh(); }, 20);
-
-  // Refresh sidebar and clear output
-  buildSidebar();
-  clearOutput();
-
-  // Close mobile sidebar
-  document.getElementById('sidebar').classList.remove('open');
-}
-
-function loadSandbox() {
-  saveCurrentCode();
-  inSandbox = true;
-
-  document.getElementById('lessonNum').textContent = 'Free Play';
-  document.getElementById('lessonTitle').textContent = SANDBOX.title;
-  document.getElementById('lessonDesc').innerHTML = SANDBOX.desc;
-
-  // Hide challenge and hint for sandbox
-  document.getElementById('challengeBox').style.display = 'none';
-  document.getElementById('hintBtn').style.display = 'none';
-  document.getElementById('hintBox').classList.remove('show');
-  document.getElementById('chips').innerHTML = '';
-
-  var code = savedCode['sandbox'] || SANDBOX.code;
-  editor.setValue(code);
-  editor.clearHistory();
-  setTimeout(function() { editor.refresh(); }, 20);
-
-  buildSidebar();
-  clearOutput();
-  document.getElementById('sidebar').classList.remove('open');
-}
-
-// ══════════════════════════════════════════════════════════
-//  UI HELPERS
-// ══════════════════════════════════════════════════════════
-function resetCode() {
-  if (inSandbox) {
-    editor.setValue(SANDBOX.code);
-    delete savedCode['sandbox'];
-  } else {
-    editor.setValue(LESSONS[currentIdx].code);
-    delete savedCode[String(currentIdx)];
-  }
-  editor.clearHistory();
-  saveState();
-}
-
-function toggleHint() {
-  document.getElementById('hintBox').classList.toggle('show');
-}
-
-function clearOutput() {
-  document.getElementById('outputWrap').innerHTML =
-    '<div class="output-placeholder">' +
-    '<span class="big-emoji">👆</span>' +
-    'Hit <strong>▶ Run</strong> to see your code come to life!' +
-    '</div>';
-}
-
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
-}
-
-// ══════════════════════════════════════════════════════════
-//  CODE EXECUTION
-// ══════════════════════════════════════════════════════════
-async function runCode() {
-  if (!pyodide) {
-    alert('Python is still loading — please wait a moment!');
-    return;
-  }
-  if (isRunning) return;
-  isRunning = true;
-
-  var btn = document.getElementById('runBtn');
-  btn.disabled = true;
-  btn.textContent = '⏳ Running...';
-
-  // Save current code
-  saveCurrentCode();
-  saveState();
-
-  // Clear output area
-  var outputWrap = document.getElementById('outputWrap');
-  outputWrap.innerHTML = '';
-
-  var code = editor.getValue();
-
-  try {
-    // Redirect stdout and stderr
-    await pyodide.runPythonAsync(
-      'import sys\n' +
-      'from io import StringIO\n' +
-      'sys.stdout = StringIO()\n' +
-      'sys.stderr = StringIO()\n'
-    );
-
-    // Run the user's code
-    try {
-      await pyodide.runPythonAsync(code);
-    } catch (pyErr) {
-      // Get any partial output before the error
-      var partialOutput = await pyodide.runPythonAsync('sys.stdout.getvalue()');
-      if (partialOutput) appendOutput(partialOutput, 'stdout');
-      appendOutput(formatError(pyErr.message), 'stderr');
-      finishRun();
-      return;
+// ═══ RUN CODE ═══
+async function runCode(){
+  if(!pyodide){alert("Python still loading!");return;}
+  if(running)return;running=true;
+  var btn=document.getElementById("rb");btn.disabled=true;btn.textContent="⏳ Running...";
+  saveCur();saveSt();
+  document.getElementById("ow").innerHTML="";
+  document.getElementById("cw").style.display="none";
+  // Reset canvas
+  _cx.clearRect(0,0,400,300);
+  var code=editor.getValue();
+  try{
+    await pyodide.runPythonAsync("import sys\nfrom io import StringIO\nsys.stdout=StringIO()\nsys.stderr=StringIO()");
+    try{await pyodide.runPythonAsync(code);}catch(e){
+      var p=await pyodide.runPythonAsync("sys.stdout.getvalue()");if(p)addOut(p,"so");
+      addOut(fmtErr(e.message),"se");fin();return;
     }
-
-    // Get captured output
-    var stdout = await pyodide.runPythonAsync('sys.stdout.getvalue()');
-    var stderr = await pyodide.runPythonAsync('sys.stderr.getvalue()');
-
-    if (stdout) appendOutput(stdout, 'stdout');
-    if (stderr) appendOutput(stderr, 'stderr');
-
-    if (!stdout && !stderr) {
-      outputWrap.innerHTML =
-        '<div class="output-line system">' +
-        '✅ Code ran successfully! (No output — try adding a print() statement)' +
-        '</div>';
-    }
-
-    // Check if challenge is completed
-    if (!inSandbox && stdout) {
-      var lesson = LESSONS[currentIdx];
-      if (lesson.check(stdout) && !completed.has(currentIdx)) {
-        completed.add(currentIdx);
-        saveState();
-        updateProgress();
-        buildSidebar();
-        showSuccess();
-        checkChapterBadge(lesson.ch);
-      }
-    }
-
-  } catch (err) {
-    appendOutput(formatError(err.message), 'stderr');
-  }
-
-  // Restore stdout/stderr
-  try {
-    await pyodide.runPythonAsync(
-      'import sys\n' +
-      'sys.stdout = sys.__stdout__\n' +
-      'sys.stderr = sys.__stderr__\n'
-    );
-  } catch (e) {}
-
-  finishRun();
+    var so=await pyodide.runPythonAsync("sys.stdout.getvalue()");
+    var se=await pyodide.runPythonAsync("sys.stderr.getvalue()");
+    if(so)addOut(so,"so");if(se)addOut(se,"se");
+    if(!so&&!se&&document.getElementById("cw").style.display==="none")
+      document.getElementById("ow").innerHTML='<div class="ol sy">✅ Code ran! (No output — try print() or drawing commands)</div>';
+    if(!sandbox&&so){var l=LESSONS[cur];if(l.check(so)&&!done.has(cur)){done.add(cur);saveSt();buildSB();showWin();chkBadge(l.ch);}}
+  }catch(e){addOut(fmtErr(e.message),"se");}
+  try{await pyodide.runPythonAsync("import sys\nsys.stdout=sys.__stdout__\nsys.stderr=sys.__stderr__");}catch(e){}
+  fin();
+  function fin(){btn.disabled=false;btn.textContent="▶ Run";running=false;}
 }
+function fmtErr(m){var ls=m.split("\n"),r=[],c=false;for(var i=0;i<ls.length;i++){if(ls[i].indexOf("Error")!==-1)c=true;if(c||ls[i].trim().indexOf('File "<exec>"')===0)r.push(ls[i]);}return"❌ Oops! "+(r.length?r.join("\n"):m);}
+function addOut(t,cls){var w=document.getElementById("ow"),ls=t.split("\n");if(ls[ls.length-1]==="")ls.pop();for(var i=0;i<ls.length;i++){if(ls[i]==="[canvas] cleared")continue;var d=document.createElement("div");d.className="ol "+cls;d.textContent=ls[i];w.appendChild(d);}}
 
-function finishRun() {
-  var btn = document.getElementById('runBtn');
-  btn.disabled = false;
-  btn.textContent = '▶ Run';
-  isRunning = false;
-}
-
-function formatError(msg) {
-  // Clean up Pyodide traces to be less scary for kids
-  var lines = msg.split('\n');
-  var relevant = [];
-  var capturing = false;
-  for (var i = 0; i < lines.length; i++) {
-    var line = lines[i];
-    if (line.indexOf('Error') !== -1 || line.indexOf('error') !== -1) {
-      capturing = true;
-    }
-    if (capturing || line.trim().indexOf('File "<exec>"') === 0) {
-      relevant.push(line);
-    }
-  }
-  if (relevant.length > 0) {
-    return '❌ Oops! ' + relevant.join('\n');
-  }
-  return '❌ Oops! ' + msg;
-}
-
-function appendOutput(text, type) {
-  var wrap = document.getElementById('outputWrap');
-  var lines = text.split('\n');
-  // Remove trailing empty line
-  if (lines.length > 0 && lines[lines.length - 1] === '') {
-    lines.pop();
-  }
-  for (var i = 0; i < lines.length; i++) {
-    var div = document.createElement('div');
-    div.className = 'output-line ' + type;
-    div.textContent = lines[i];
-    wrap.appendChild(div);
-  }
-}
-
-// ══════════════════════════════════════════════════════════
-//  CELEBRATIONS
-// ══════════════════════════════════════════════════════════
-var SUCCESS_MESSAGES = [
-  "🎉 Mission Complete!",
-  "⭐ Nailed it!",
-  "🚀 You're a natural!",
-  "🏆 Challenge crushed!",
-  "💪 Awesome work!",
-  "🌟 Brilliant!",
-  "🎯 Bullseye!",
-  "🐍 Python pro in the making!",
-  "🔥 On fire!",
-  "✨ Spectacular!",
-  "🎮 Level up!",
-  "💎 Flawless!",
-];
-
-function showSuccess() {
-  var toast = document.getElementById('successToast');
-  var msg = SUCCESS_MESSAGES[Math.floor(Math.random() * SUCCESS_MESSAGES.length)];
-  document.getElementById('successMsg').textContent = msg;
-  toast.classList.add('show');
-  launchConfetti();
-  setTimeout(function() { toast.classList.remove('show'); }, 3500);
-}
-
-function checkChapterBadge(chapterIndex) {
-  // Check if all lessons in this chapter are complete
-  var chapterLessons = [];
-  for (var i = 0; i < LESSONS.length; i++) {
-    if (LESSONS[i].ch === chapterIndex) {
-      chapterLessons.push(i);
-    }
-  }
-
-  var allDone = chapterLessons.every(function(idx) {
-    return completed.has(idx);
-  });
-
-  if (allDone) {
-    var ch = CHAPTERS[chapterIndex];
-    // Show badge toast after success toast
-    setTimeout(function() {
-      document.getElementById('badgeIcon').textContent = ch.badge;
-      document.getElementById('badgeTitle').textContent = ch.name + ' Complete!';
-      document.getElementById('badgeSub').textContent =
-        'You earned the ' + ch.badge + ' badge!';
-      var badgeToast = document.getElementById('badgeToast');
-      badgeToast.classList.add('show');
-      launchConfetti();
-      setTimeout(function() {
-        badgeToast.classList.remove('show');
-      }, 4500);
-    }, 4000);
-  }
-}
-
-function launchConfetti() {
-  var container = document.getElementById('confettiBox');
-  var colors = ['#2de2e6', '#f5c842', '#0eff9d', '#ff4f7b', '#b07aff', '#ff9f43'];
-
-  for (var i = 0; i < 55; i++) {
-    var bit = document.createElement('div');
-    bit.className = 'confetti-bit';
-    bit.style.left = (Math.random() * 100) + '%';
-    bit.style.background = colors[Math.floor(Math.random() * colors.length)];
-    bit.style.width = (Math.random() * 8 + 4) + 'px';
-    bit.style.height = (Math.random() * 8 + 4) + 'px';
-    bit.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
-    bit.style.animationDelay = (Math.random() * 0.6) + 's';
-    container.appendChild(bit);
-  }
-
-  setTimeout(function() { container.innerHTML = ''; }, 4500);
-}
-
-// ══════════════════════════════════════════════════════════
-//  KEYBOARD SHORTCUT
-// ══════════════════════════════════════════════════════════
-document.addEventListener('keydown', function(e) {
-  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-    e.preventDefault();
-    runCode();
-  }
-});
-
-// ══════════════════════════════════════════════════════════
-//  START THE APP!
-// ══════════════════════════════════════════════════════════
+// ═══ CELEBRATIONS ═══
+var MSGS=["🎉 Mission Complete!","⭐ Nailed it!","🚀 You're a natural!","🏆 Crushed it!","💪 Awesome!","🌟 Brilliant!","🎯 Bullseye!","🐍 Python pro!","🔥 On fire!","✨ Spectacular!"];
+function showWin(){var t=document.getElementById("sToast");document.getElementById("sMsg").textContent=MSGS[Math.floor(Math.random()*MSGS.length)];t.classList.add("show");confetti();setTimeout(function(){t.classList.remove("show");},3500);}
+function chkBadge(ci){var cls=[];for(var i=0;i<LESSONS.length;i++)if(LESSONS[i].ch===ci)cls.push(i);if(cls.every(function(x){return done.has(x);})){var c=CHAPTERS[ci];setTimeout(function(){document.getElementById("bI").textContent=c.badge;document.getElementById("bT").textContent=c.name+" Complete!";document.getElementById("bS").textContent="You earned the "+c.badge+" badge!";var bt=document.getElementById("bToast");bt.classList.add("show");confetti();setTimeout(function(){bt.classList.remove("show");},4500);},4e3);}}
+function confetti(){var b=document.getElementById("cBox"),cs=["#2de2e6","#f5c842","#0eff9d","#ff4f7b","#b07aff","#ff9f43"];for(var i=0;i<50;i++){var e=document.createElement("div");e.className="cb";e.style.left=Math.random()*100+"%";e.style.background=cs[Math.floor(Math.random()*cs.length)];e.style.width=(Math.random()*8+4)+"px";e.style.height=(Math.random()*8+4)+"px";e.style.animationDuration=(Math.random()*2+1.5)+"s";e.style.animationDelay=(Math.random()*.5)+"s";b.appendChild(e);}setTimeout(function(){b.innerHTML="";},4500);}
+document.addEventListener("keydown",function(e){if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();runCode();}});
 init();
 
 </script>
